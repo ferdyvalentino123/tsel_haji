@@ -21,7 +21,7 @@ use App\Http\Controllers\KasirController;
 
 // Root landing page redirect
 Route::get('/', function () {
-    return redirect('/programhaji/login');
+    return view ('welcome');
 });
 
 // Programhaji landing page redirect
