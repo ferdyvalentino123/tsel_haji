@@ -283,7 +283,7 @@
         <h1>PONDOK HAJI Telkomsel</h1>
         <p>Selamat datang di sistem layanan pelanggan dan transaksi <strong style="color: #ec1c24;">Program Haji
                 Telkomsel</strong><br>
-            Untuk <strong>Sales & Supervisor</strong> - Semangat Melayani Jamaah Menuju Tanah Suci<br>
+            Untuk <strong>Sales & Kasir</strong> - Semangat Melayani Jamaah Menuju Tanah Suci<br>
             <br> Silakan masuk untuk melanjutkan aktivitas Anda.
         </p>
         <a href="{{ url('/programhaji/login') }}" class="btn-cta">
@@ -351,7 +351,7 @@
             🌟 Setiap langkah kecil untuk membantu ibadah, bernilai besar di sisi-Nya. --}}
             </div>
 
-            <!-- Paket RoaMAX Section -->
+            {{-- <!-- Paket RoaMAX Section -->
             <div class="row">
                 <!-- Card 1 -->
                 <div class="col-12 col-sm-6 col-md-4 mt-5">
@@ -671,7 +671,7 @@
                     </div>
                 </div>
             </div>
-    </section>
+    </section> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>

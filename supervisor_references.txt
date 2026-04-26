@@ -1,0 +1,133 @@
+﻿# COMPREHENSIVE SUPERVISOR REFERENCE REPORT
+# Project: c:\Users\ferdy valentino\valen\tsel_hajii
+# Generated: 04/26/2026 21:50:25
+
+## DETAILED REFERENCE LIST
+
+### 1. MIDDLEWARE FILES
+File: app/Http/Middleware/EnsureSupervisor.php
+  Line 9:  class EnsureSupervisor
+  Line 16: if (Auth::check() && Auth::user()->role === 'supervisor')
+
+### 2. ROUTES FILES
+File: routes/supervisor.php
+  Line 4: use App\Http\Controllers\Supervisor\DashboardController;
+  Line 5: use App\Http\Controllers\Supervisor\ExportApprovedTransaksiController;
+  Line 6: use App\Http\Controllers\Supervisor\ExportRiwayatTransaksiController;
+  Line 8: // Supervisor Routes (require auth and supervisor role)
+  Line 9: Route::middleware(['auth', 'supervisor'])->group(function () {
+  Line 10: Route::get('/programhaji/supervisor', [DashboardController::class, 'index'])->name('supvis.home');
+  Line 11: Route::post('/programhaji/supervisor/export-approved', ...
+  Line 12: Route::post('/programhaji/supervisor/export-riwayat', ...
+
+File: routes/web.php
+  Line 31: // Supervisor Routes (auth + role:supervisor) - PLACEHOLDER
+  Line 32: require __DIR__ . '/supervisor.php';
+
+### 3. CONTROLLERS
+File: app/Http/Controllers/Supervisor/DashboardController.php
+  Line 2: namespace App\Http\Controllers\Supervisor;
+  Line 17: // Get dashboard data for supervisor
+  Line 21: return view('supervisor.dashboard', [
+
+File: app/Http/Controllers/Supervisor/ExportApprovedTransaksiController.php
+  Line 4: namespace App\Http\Controllers\Supervisor;
+
+File: app/Http/Controllers/Supervisor/ExportRiwayatTransaksiController.php
+  Line 3: namespace App\Http\Controllers\Supervisor;
+  Line 15: \ = \->only(['id_supervisor', 'metode_pembayaran', 'tanggal_transaksi']);
+
+### 4. MODELS
+File: app/Models/RoleUsers.php
+  Line 46: // return \->role === 'supervisor' && \->is_superuser;
+
+File: app/Models/Transaksi.php
+  Line 43: 'id_supervisor',
+  Line 79: // Relasi ke RoleUsers (Supervisor)
+  Line 80: public function supervisor()
+  Line 82: return \->belongsTo(RoleUsers::class, 'id_supervisor');
+  Line 88: return \->belongsTo(RoleUsers::class, 'id_supervisor');
+
+### 5. PROVIDERS
+File: app/Providers/AppServiceProvider.php
+  Line 26: return \->hasRole('supervisor') ? true : null;
+
+### 6. MIGRATIONS
+File: database/migrations/2025_01_14_065926_create_role_users_table.php
+  Line 21: \->enum('role', ['supervisor', 'sales','kasir'])->default('sales');
+
+File: database/migrations/2025_01_20_055344_create_transaksis_table.php
+  Line 31: \->unsignedBigInteger('id_supervisor')->nullable();
+  Line 32: \->foreign('id_supervisor')->references('id')->on('role_users')->onDelete('set null');
+
+File: database/migrations/2025_11_29_180433_add_pelanggan_role_to_role_users_table.php
+  Line 17: DB::statement(\"ALTER TABLE role_users MODIFY COLUMN role ENUM('supervisor', 'sales', 'kasir', 'pelanggan') DEFAULT 'sales'\");
+  Line 28: DB::statement(\"ALTER TABLE role_users MODIFY COLUMN role ENUM('supervisor', 'sales', 'kasir') DEFAULT 'sales'\");
+
+File: database/migrations/2025_11_29_181155_add_pelanggan_fields_to_transaksis_table.php
+  Line 16: \->unsignedBigInteger('id_pelanggan')->nullable()->after('id_supervisor');
+
+File: database/migrations/2026_04_18_153114_add_travel_to_role_enum.php
+  Line 5-9: Multiple references to 'supervisor' in ENUM
+
+### 7. SEEDERS
+File: database/seeders/CreateSuperUserSeeder.php
+  Line 20: 'role' => 'supervisor',
+
+File: database/seeders/RoleUsersSeeder.php
+  Line 34: 'supervisor' => ['manage tasks', 'view tasks', 'assign tasks'],
+  Line 47: 'name' => 'Supervisor ',
+  Line 48: 'email' => 'supervisor@test.com',
+  Line 50: 'role' => 'supervisor',
+  Line 60: 'role' => 'supervisor',
+
+### 8. VIEWS - supervisor/ FOLDER
+File: resources/views/supervisor/dashboard.blade.php
+  Line 8: <h1 class=\"text-3xl font-bold text-gray-900\">Supervisor Dashboard</h1>
+  Line 9: <p class=\"text-gray-600 mt-2\">Selamat datang, {{ Auth::user()->name ?? 'Supervisor' }}</p>
+  Line 70: <h2 class=\"text-xl font-bold text-gray-900 mb-4\">Informasi Supervisor</h2>
+
+### 9. VIEWS - supvis/ FOLDER  
+File: resources/views/supvis/add_sales.blade.php
+  Line 194: <option value=\"Supervisor\" disabled>Supervisor</option>
+  Line 278: const validRoles = ['Sales', 'Supervisor'];
+
+File: resources/views/supvis/add_supvis.blade.php
+  Line 132: <h1 class=\"text-center mb-5 mt-5\"><strong>Tambah Kasir / Supervisor</strong></h1>
+  Line 148: label=\"Nama Kasir / Supervisor\"
+  Line 150: placeholder=\"Masukkan nama Kasir / Supervisor\"
+  Line 194: <option value=\"Supervisor\" >Supervisor</option>
+  Line 229: if (!value) return 'Nama Supervisor wajib diisi';
+  Line 276: const validRoles = ['Sales', 'Supervisor', 'Kasir'];
+
+File: resources/views/supvis/approvetransaksi.blade.php
+  Line 236: item.supervisor?.name ?? '',
+
+File: resources/views/supvis/RiwayatTransaksi.blade.php
+  Line 205: <select name=\"id_supervisor\" {{ \ ? 'disabled' : '' }}>
+  Line 207: @foreach(\->pluck('supervisor')->filter()->unique('id')->sortBy('name') as \)
+  Line 208-210: Option value and selection logic
+  Line 216: <input type=\"hidden\" name=\"id_supervisor\" value=\"{{ \->id }}\">
+  Line 334: <td data-label=\"Kasir\">{{ \->supervisor?->name }}</td>
+  Line 367: // Force id_supervisor into export URL if role is kasir
+  Line 369: \['id_supervisor'] = auth()->user()->id;
+
+### 10. VIEWS - WELCOME & COMPONENTS
+File: resources/views/welcome.blade.php
+  Line 286: Untuk <strong>Sales & Supervisor</strong> - Semangat Melayani Jamaah Menuju Tanah Suci<br>
+
+File: resources/views/components/supvis/left-drawer.blade.php
+  Line 22: Add Kasir / Supervisor
+
+### 11. DOCUMENTATION FILES
+File: FITUR_PELANGGAN.md
+  Line 224: Admin/supervisor dapat memproses lebih lanjut
+  Line 255: Role supervisor, sales, dan kasir tetap berfungsi normal
+  Line 256: Transaksi pelanggan dapat dipantau oleh supervisor melalui dashboard mereka
+
+File: GOOGLE_OAUTH_SETUP.md
+  Line 129: Sales/Supervisor/Kasir tetap pakai PIN
+
+File: QUICK_START_PELANGGAN.md
+  Line 220: Terintegrasi dengan role supervisor/sales/kasir
+

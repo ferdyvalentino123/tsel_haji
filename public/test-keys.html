@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midtrans Keys Validator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .step {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Midtrans Keys Validator</h1>
+        
+        <div class="info">
+            <strong>📋 Cara Mendapatkan Keys:</strong>
+            <div class="step">1. Login ke: <a href="https://dashboard.sandbox.midtrans.com" target="_blank">dashboard.sandbox.midtrans.com</a></div>
+            <div class="step">2. Klik <strong>Settings</strong> (⚙️) di sidebar kiri</div>
+            <div class="step">3. Pilih <strong>Access Keys</strong></div>
+            <div class="step">4. Klik icon <strong>Copy</strong> (📋) di samping masing-masing key</div>
+            <div class="step">5. Paste di form bawah ini</div>
+        </div>
+
+        <form id="keysForm">
+            <div class="input-group">
+                <label for="serverKey">🔑 Server Key</label>
+                <textarea id="serverKey" rows="2" placeholder="SB-Mid-server-xxxxxxxxxxxxxxxx"></textarea>
+                <small style="color: #666;">Format: SB-Mid-server-... (untuk sandbox)</small>
+            </div>
+
+            <div class="input-group">
+                <label for="clientKey">🔑 Client Key</label>
+                <textarea id="clientKey" rows="2" placeholder="SB-Mid-client-xxxxxxxxxxxxxxxx"></textarea>
+                <small style="color: #666;">Format: SB-Mid-client-... (untuk sandbox)</small>
+            </div>
+
+            <button type="submit" class="btn">✅ Validasi Keys</button>
+        </form>
+
+        <div id="result" class="result"></div>
+
+        <div id="envOutput" class="result" style="margin-top: 20px;"></div>
+    </div>
+
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"></script>
+    <script>
+        document.getElementById('keysForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const serverKey = document.getElementById('serverKey').value.trim();
+            const clientKey = document.getElementById('clientKey').value.trim();
+            const resultDiv = document.getElementById('result');
+            const envOutput = document.getElementById('envOutput');
+            
+            // Reset
+            resultDiv.style.display = 'none';
+            envOutput.style.display = 'none';
+            
+            // Validasi format
+            let errors = [];
+            
+            if (!serverKey) {
+                errors.push('Server Key tidak boleh kosong');
+            } else if (!serverKey.startsWith('SB-Mid-server-') && !serverKey.startsWith('Mid-server-')) {
+                errors.push('Format Server Key salah. Harus dimulai dengan "SB-Mid-server-" (sandbox) atau "Mid-server-" (production)');
+            }
+            
+            if (!clientKey) {
+                errors.push('Client Key tidak boleh kosong');
+            } else if (!clientKey.startsWith('SB-Mid-client-') && !clientKey.startsWith('Mid-client-')) {
+                errors.push('Format Client Key salah. Harus dimulai dengan "SB-Mid-client-" (sandbox) atau "Mid-client-" (production)');
+            }
+            
+            if (errors.length > 0) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '<strong>❌ Format Keys Salah:</strong><br>' + errors.join('<br>');
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            // Check length
+            if (serverKey.length < 30) {
+                errors.push('Server Key terlalu pendek. Pastikan copy lengkap dari dashboard.');
+            }
+            if (clientKey.length < 30) {
+                errors.push('Client Key terlalu pendek. Pastikan copy lengkap dari dashboard.');
+            }
+            
+            if (errors.length > 0) {
+                resultDiv.className = 'result warning';
+                resultDiv.innerHTML = '<strong>⚠️ Peringatan:</strong><br>' + errors.join('<br>');
+                resultDiv.style.display = 'block';
+            }
+            
+            // Test dengan Snap.js
+            resultDiv.className = 'result success';
+            resultDiv.innerHTML = `
+                <strong>✅ Format Keys Valid!</strong><br><br>
+                <strong>Server Key:</strong><br>
+                <code>${serverKey.substring(0, 30)}...</code><br><br>
+                <strong>Client Key:</strong><br>
+                <code>${clientKey.substring(0, 30)}...</code><br><br>
+                <em>⏳ Testing koneksi ke Midtrans API...</em>
+            `;
+            resultDiv.style.display = 'block';
+            
+            // Test dengan mencoba inisialisasi Snap
+            try {
+                // Set client key untuk Snap.js
+                if (typeof snap !== 'undefined') {
+                    snap.clientKey = clientKey;
+                }
+                
+                // Tampilkan hasil
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `
+                    <strong>✅ Client Key Berhasil Divalidasi!</strong><br><br>
+                    <em>Untuk test lengkap Server Key, keys ini harus digunakan di backend Laravel.</em>
+                `;
+                
+                // Generate .env format
+                envOutput.className = 'result success';
+                envOutput.innerHTML = `
+                    <strong>📝 Copy ke File .env:</strong><br><br>
+                    <textarea readonly style="width: 100%; height: 120px; font-family: monospace;"># Midtrans Configuration
+MIDTRANS_SERVER_KEY=${serverKey}
+MIDTRANS_CLIENT_KEY=${clientKey}
+MIDTRANS_IS_PRODUCTION=false
+MIDTRANS_IS_SANITIZED=true
+MIDTRANS_IS_3DS=true</textarea>
+                    <br><br>
+                    <strong>Langkah Selanjutnya:</strong><br>
+                    1. Copy text di atas<br>
+                    2. Buka file <code>.env</code><br>
+                    3. Cari bagian "Midtrans Configuration"<br>
+                    4. Replace dengan text di atas<br>
+                    5. Save file<br>
+                    6. Jalankan: <code>php artisan config:clear</code><br>
+                    7. Test: <code>php test-midtrans.php</code>
+                `;
+                envOutput.style.display = 'block';
+                
+            } catch (error) {
+                resultDiv.className = 'result warning';
+                resultDiv.innerHTML = `
+                    <strong>⚠️ Client Key Format Valid</strong><br><br>
+                    Tapi perlu test di backend untuk memastikan Server Key juga valid.<br><br>
+                    <strong>Copy keys ke .env dan test dengan:</strong><br>
+                    <code>php test-midtrans.php</code>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -233,7 +233,7 @@
                         response.transaksi.forEach(function (item) {
                             table.row.add([
                                 item.id_transaksi,
-                                item.supervisor?.name ?? '',
+                                item.Kasir?.name ?? '',
                                 item.sales?.tempat_tugas ?? '-',
                                 formatDateTime(item.tanggal_transaksi ?? ''),
                                 item.nama_pelanggan ?? '',

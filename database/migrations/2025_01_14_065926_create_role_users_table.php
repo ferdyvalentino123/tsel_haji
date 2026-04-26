@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('photo')->nullable();
             $table->string('pin');
             $table->string('phone')->nullable();
-            $table->enum('role', ['supervisor', 'sales','kasir'])->default('sales');
+            $table->enum('role', ['admin', 'supervisor', 'sales'])->default('sales');
             $table->timestamps();
         });
     }

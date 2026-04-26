@@ -17,7 +17,7 @@ class CreateSuperUserSeeder extends Seeder
             'name' => 'Super Super',
             'email' =>'supersuper@example.com',
             'pin' => bcrypt('123456'),
-            'role' => 'supervisor',
+            'role' => 'kasir',
             'is_superuser' => true,
         ]);
     }

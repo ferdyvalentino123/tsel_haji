@@ -191,7 +191,7 @@
                 <select id="role" name="role">
                     <option value="">Pilih Role</option>
                     <option value="Sales">Sales</option>
-                    <option value="Supervisor" disabled>Supervisor</option>
+                    <option value="Kasir" disabled>Kasir</option>
                 </select>
                 <div class="error" id="roleError"></div>
             </div>
@@ -275,7 +275,7 @@
             role: {
                 validate: (value) => {
                     if (!value) return 'Role wajib dipilih';
-                    const validRoles = ['Sales', 'Supervisor'];
+                    const validRoles = ['Sales', 'Kasir'];
                     if (!validRoles.includes(value)) return 'Role tidak valid';
                     return null;
                 }

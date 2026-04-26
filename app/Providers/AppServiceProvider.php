@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('supervisor') ? true : null;
+            return $user->hasRole('kasir') ? true : null;
         });
 
         DB::listen(function ($query) {

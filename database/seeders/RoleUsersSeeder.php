@@ -31,9 +31,9 @@ class RoleUsersSeeder extends Seeder
 
         // Create roles and assign permissions
         $roles = [
+            'admin' => ['manage tasks', 'view tasks', 'assign tasks'],
             'supervisor' => ['manage tasks', 'view tasks', 'assign tasks'],
-            'sales' => ['view tasks'],
-             'kasir'=> ['view tasks']
+            'sales' => ['view tasks']
         ];
 
         foreach ($roles as $roleName => $rolePermissions) {
@@ -44,39 +44,37 @@ class RoleUsersSeeder extends Seeder
         // Create users and assign roles
         DB::table('role_users')->insert([
             [
-                'name' => 'Supervisor ',
+                'name' => 'Admin',
+                'email' => 'admin@test.com',
+                'pin' => Hash::make('123456'),
+                'role' => 'admin',
+                'is_superuser' => true,
+                'is_setoran' => false,
+                'phone' => "081231780991",
+            ],
+            [
+                'name' => 'Kasir',
                 'email' => 'supervisor@test.com',
                 'pin' => Hash::make('123456'),
                 'role' => 'supervisor',
                 'is_superuser' => false,
                 'is_setoran' => false,
                 'phone' => "081231780991",
-
             ],
             [
-                'name' => 'Superuservisor ',
-                'email' => 'superuservisor@test.com',
+                'name' => 'Kasir Utama',
+                'email' => 'kasir@test.com',
                 'pin' => Hash::make('123456'),
                 'role' => 'supervisor',
                 'is_superuser' => true,
                 'is_setoran' => false,
                 'phone' => "081231780991",
-
             ],
             [
-                'name' => 'Sales ',
+                'name' => 'Sales',
                 'email' => 'sales@test.com',
                 'pin' => Hash::make('123456'),
                 'role' => 'sales',
-                'is_superuser' => false,
-                'is_setoran' => true,
-                'phone' => "081231780991",
-            ],
-             [
-                'name' => 'Kasir ',
-                'email' => 'kasir@test.com',
-                'pin' => Hash::make('123456'),
-                'role' => 'kasir',
                 'is_superuser' => false,
                 'is_setoran' => true,
                 'phone' => "081231780991",

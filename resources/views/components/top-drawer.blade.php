@@ -11,7 +11,7 @@
     </a>
 
                 <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-                    <img src="{{ asset('storage/' . Auth::user()->photo) }}" alt="Profile Photo" class="img-fluid" style="max-width: 25px; max-height: 25px; object-fit: cover;">
+                    <img src="{{ asset('?' . Auth::user()->photo) }}" alt="Profile Photo" class="img-fluid" style="max-width: 25px; max-height: 25px; object-fit: cover;">
                     <span class="text-dark">{{ auth()->user()->name }}</span>
     </a>
                 <div class="dropdown-menu dropdown-menu-end">

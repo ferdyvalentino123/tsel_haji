@@ -13,11 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Alias middleware
         $middleware->alias([
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'role' => App\Http\Middleware\CheckRole::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'admin' => App\Http\Middleware\EnsureAdmin::class,
             'supervisor' => App\Http\Middleware\EnsureSupervisor::class,
-            'sales' => App\Http\Middleware\EnsureSales::class, // Tambahkan di sini
+            'kasir' => App\Http\Middleware\EnsureKasir::class,
+            'sales' => App\Http\Middleware\EnsureSales::class,
+            'pelanggan' => App\Http\Middleware\PelangganMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

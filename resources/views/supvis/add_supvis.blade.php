@@ -129,7 +129,7 @@
 
 <body>
     <div class="container">
-        <h1 class="text-center mb-5 mt-5"><strong>Tambah Kasir / Supervisor</strong></h1>
+        <h1 class="text-center mb-5 mt-5"><strong>Tambah Kasir / Kasir</strong></h1>
         <x-form-card>
         <form id="addSupvisForm" action="{{ route('supvis.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -145,9 +145,9 @@
                 </div>
             </div>
             <x-form-group 
-                label="Nama Kasir / Supervisor" 
+                label="Nama Kasir / Kasir" 
                 name="name" 
-                placeholder="Masukkan nama Kasir / Supervisor" 
+                placeholder="Masukkan nama Kasir / Kasir" 
                 required="true"
                 oninput="validateName(this)"
             />
@@ -191,7 +191,7 @@
                 <select id="role" name="role">
                     <option value="">Pilih Role</option>
                     <option value="Sales"disabled>Sales</option>
-                    <option value="Supervisor" >Supervisor</option>
+                    <option value="Kasir" >Kasir</option>
                     <option value="Kasir" >Kasir</option>
                 </select>
                 <div class="error" id="roleError"></div>
@@ -226,7 +226,7 @@
         const ValidationRules = {
             name: {
                 validate: (value) => {
-                    if (!value) return 'Nama Supervisor wajib diisi';
+                    if (!value) return 'Nama Kasir wajib diisi';
                     if (value.length > 255) return 'Nama tidak boleh lebih dari 255 karakter';
                     if (!/^[a-zA-Z\s]*$/.test(value)) return 'Nama hanya boleh mengandung huruf dan spasi';
                     return null;
@@ -273,7 +273,7 @@
             role: {
                 validate: (value) => {
                     if (!value) return 'Role wajib dipilih';
-                    const validRoles = ['Sales', 'Supervisor', 'Kasir'];
+                    const validRoles = ['Sales', 'Kasir', 'Kasir'];
                     if (!validRoles.includes(value)) return 'Role tidak valid';
                     return null;
                 }

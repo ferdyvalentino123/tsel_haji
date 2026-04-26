@@ -43,7 +43,7 @@ class RoleUsers extends Authenticatable
      */
     // public function isSuperUser(): bool
     // {
-    //     return $this->role === 'supervisor' && $this->is_superuser;
+    //     return $this->role === 'kasir' && $this->is_superuser;
     // }
 
     // In your RoleUsers model or User model

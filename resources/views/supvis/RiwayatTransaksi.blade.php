@@ -202,18 +202,18 @@
             @endphp
             
             <div class="filter-box">
-                <select name="id_supervisor" {{ $isKasir ? 'disabled' : '' }}>
+                <select name="id_kasir" {{ $isKasir ? 'disabled' : '' }}>
                     <option value="">Semua Kasir</option>
-                    @foreach($transaksi->pluck('supervisor')->filter()->unique('id')->sortBy('name') as $supervisor)
-                        <option value="{{ $supervisor->id }}"
-                            {{ (request('id_supervisor') ?? ($isKasir ? $user->id : null)) == $supervisor->id ? 'selected' : '' }}>
-                            {{ $supervisor->name }}
+                    @foreach($transaksi->pluck('Kasir')->filter()->unique('id')->sortBy('name') as $Kasir)
+                        <option value="{{ $Kasir->id }}"
+                            {{ (request('id_kasir') ?? ($isKasir ? $user->id : null)) == $Kasir->id ? 'selected' : '' }}>
+                            {{ $Kasir->name }}
                         </option>
                     @endforeach
                 </select>
             
                 @if($isKasir)
-                    <input type="hidden" name="id_supervisor" value="{{ $user->id }}">
+                    <input type="hidden" name="id_kasir" value="{{ $user->id }}">
                 @endif
             </div>
         
@@ -331,7 +331,7 @@
                         @foreach ($transaksi as $transaction)
                             <tr>
                                 <td data-label="ID Transaksi">{{ $transaction->id_transaksi }}</td>
-                                <td data-label="Kasir">{{ $transaction->supervisor?->name }}</td>
+                                <td data-label="Kasir">{{ $transaction->Kasir?->name }}</td>
                                 <td data-label="Tanggal Transaksi">{{ $transaction->tanggal_transaksi }}</td>
                                 <td data-label="Nama Sales">{{ $transaction->nama_sales }}</td>
                                 <td data-label="No. Tlp Sales">{{ $transaction->nomor_telepon }}</td>
@@ -364,9 +364,9 @@
         @php
             $queryParams = request()->query();
         
-            // Force id_supervisor into export URL if role is kasir
+            // Force id_kasir into export URL if role is kasir
             if ($isKasir) {
-                $queryParams['id_supervisor'] = auth()->user()->id;
+                $queryParams['id_kasir'] = auth()->user()->id;
             }
         @endphp
 

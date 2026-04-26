@@ -11,16 +11,18 @@ class Transaksi extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $primaryKey = 'id_transaksi';
-    public $incrementing = false;
-    protected $keyType = 'string';
-    public $timestamps = false;
+    // Gunakan id sebagai primary key untuk transaksi pelanggan
+    // id_transaksi tetap ada untuk kompatibilitas dengan sistem lama
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = true;
 
     protected $casts = [
         'tanggal_transaksi' => 'datetime',
         'history_setoran' => 'array',
     ];
-    protected $dates = ['tanggal_transaksi'];
+    protected $dates = ['tanggal_transaksi', 'created_at', 'updated_at'];
 
     protected $fillable = [
         'id_transaksi',
@@ -42,12 +44,24 @@ class Transaksi extends Model
         'bertugas', // Menambahkan kolom bertugas
         'tempat_tugas', // Menambahkan kolom tempat_tugas
         'is_activated',
+        'id_pelanggan', // Field untuk pelanggan
+        'produk_id', // Field untuk produk
+        'jumlah', // Field untuk jumlah pembelian
+        'total_harga', // Field untuk total harga
+        'status', // Field untuk status transaksi
+        'snap_token', // Field untuk menyimpan Snap token
     ];
 
     // Relasi ke Produk
     public function produk()
     {
-        return $this->belongsTo(Produk::class, 'jenis_paket', 'id');
+        return $this->belongsTo(Produk::class, 'produk_id', 'id');
+    }
+
+    // Relasi ke Pelanggan
+    public function pelanggan()
+    {
+        return $this->belongsTo(RoleUsers::class, 'id_pelanggan');
     }
 
     // Relasi ke Merchandise
@@ -63,7 +77,7 @@ class Transaksi extends Model
     }
 
     // Relasi ke RoleUsers (Supervisor)
-    public function supervisor()
+    public function kasir()
     {
         return $this->belongsTo(RoleUsers::class, 'id_supervisor');
     }
@@ -89,3 +103,4 @@ class Transaksi extends Model
         return $this->belongsTo(RoleUsers::class, 'nama_sales', 'name');
     }
 }
+
