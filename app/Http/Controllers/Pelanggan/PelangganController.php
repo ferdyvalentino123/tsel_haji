@@ -49,19 +49,19 @@ class PelangganController extends Controller
     {
         $request->validate([
             'produk_id' => 'required|exists:produks,id',
-            'jumlah' => 'required|integer|min:1',
+            'nomor_telepon' => 'required|regex:/^[0-9]{10,13}$/'
         ]);
 
         $produk = Produk::findOrFail($request->produk_id);
         
-        if ($produk->produk_stok < $request->jumlah) {
+        if ($produk->produk_stok < 1) {
             return back()->with('error', 'Stok tidak mencukupi!');
         }
 
         DB::beginTransaction();
         try {
             $harga_setelah_diskon = $produk->produk_harga - ($produk->produk_harga * $produk->produk_diskon / 100);
-            $total = $harga_setelah_diskon * $request->jumlah;
+            $total = $harga_setelah_diskon * 1;
 
             $id_transaksi = 'TRX-PLG-' . Auth::id() . '-' . time() . '-' . rand(1000, 9999);
 
@@ -69,15 +69,16 @@ class PelangganController extends Controller
             $transaksi->id_transaksi = $id_transaksi;
             $transaksi->id_pelanggan = Auth::id();
             $transaksi->produk_id = $produk->id;
-            $transaksi->jumlah = $request->jumlah;
+            $transaksi->jumlah = 1;
             $transaksi->total_harga = $total;
             $transaksi->status = 'pending';
             $transaksi->nama_pelanggan = Auth::user()->name;
-            $transaksi->telepon_pelanggan = Auth::user()->phone;
+            $transaksi->telepon_pelanggan = $request->nomor_telepon;
+            $transaksi->nomor_roaming = $request->nomor_telepon; // Nomor yang akan di-roaming
             $transaksi->tanggal_transaksi = now();
             $transaksi->save();
 
-            $produk->produk_stok -= $request->jumlah;
+            $produk->produk_stok -= 1;
             $produk->save();
 
             DB::commit();

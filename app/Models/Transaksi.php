@@ -29,6 +29,7 @@ class Transaksi extends Model
         'nama_pelanggan',
         'nomor_telepon',
         'nomor_injeksi',
+        'nomor_roaming',
         'aktivasi_tanggal',
         'tanggal_transaksi',
         'nama_sales',

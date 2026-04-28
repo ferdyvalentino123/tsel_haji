@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Login - The Sacred Journey</title>
+    <title>Masuk - The Sacred Journey</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -108,7 +108,7 @@
                 <!-- Branding Overlap -->
                 <div class="z-10">
                     <h1 class="font-headline text-2xl font-extrabold tracking-tight">The Sacred Journey</h1>
-                    <p class="mt-2 text-on-primary/80 font-medium text-xs md:text-sm max-w-xs">Connecting your spiritual devotion with seamless digital excellence.</p>
+                    <p class="mt-2 text-on-primary/80 font-medium text-xs md:text-sm max-w-xs">Menghubungkan perjalanan spiritual Anda dengan kemudahan layanan digital yang terpercaya.</p>
                 </div>
                 <!-- Decorative Islamic Elements -->
                 <div class="absolute inset-0 opacity-10 pointer-events-none">
@@ -131,8 +131,8 @@
             <div class="md:w-7/12 p-6 md:p-8 lg:p-10 flex flex-col justify-center bg-surface-container-lowest">
                 <div class="max-w-md mx-auto w-full">
                     <div class="mb-5 md:mb-6">
-                        <h2 class="font-headline text-2xl font-bold text-on-surface mb-1">Login</h2>
-                        <p class="text-secondary font-medium text-xs md:text-sm">Sign in to start your journey</p>
+                        <h2 class="font-headline text-2xl font-bold text-on-surface mb-1">Masuk</h2>
+                        <p class="text-secondary font-medium text-xs md:text-sm">Masuk untuk memulai perjalanan ibadah Anda</p>
                     </div>
 
                     @if ($errors->any())
@@ -147,18 +147,18 @@
                         @csrf
                         <!-- Email Field -->
                         <div class="space-y-2">
-                            <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="email">Email Address</label>
+                            <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="email">Alamat Email</label>
                             <div class="relative group">
                                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">mail</span>
-                                <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50 text-sm" id="email" name="email" placeholder="name@example.com" type="email" value="{{ old('email') }}" required />
+                                <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50 text-sm" id="email" name="email" placeholder="pelanggan@gmail.com" type="email" value="{{ old('email') }}" required />
                             </div>
                         </div>
                         <!-- PIN Field -->
                         <div class="space-y-2">
-                            <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider" for="pin">PIN</label>
+                            <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider" for="pin">Kata Sandi (PIN)</label>
                             <div class="relative group">
                                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">lock</span>
-                                <input class="w-full pl-12 pr-12 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50 text-sm" id="pin" name="pin" placeholder="••••••••" type="password" required />
+                                <input class="w-full pl-12 pr-12 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50 text-sm" id="pin" name="pin" placeholder="Masukkan PIN Anda" type="password" required />
                                 <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant hover:text-secondary toggle-pin-visibility" type="button">
                                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                                 </button>
@@ -166,7 +166,7 @@
                         </div>
                         <!-- Submit Button -->
                         <button class="w-full py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold text-base rounded-xl shadow-lg hover:shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all duration-200 mt-2" type="submit">
-                            Log In
+                            Masuk ke Akun
                         </button>
                     </form>
                     <!-- Divider -->
@@ -175,21 +175,21 @@
                             <div class="w-full border-t border-surface-container-high"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-surface-container-lowest text-secondary font-label font-medium uppercase tracking-widest text-[10px]">Or Continue With</span>
+                            <span class="px-4 bg-surface-container-lowest text-secondary font-label font-medium uppercase tracking-widest text-[10px]">Atau Masuk Dengan</span>
                         </div>
                     </div>
                     <!-- Social Logins -->
                     <div class="grid grid-cols-1 gap-4">
                         <a href="{{ route('auth.google') }}" class="flex items-center justify-center gap-3 py-3 border border-outline-variant/30 rounded-xl hover:bg-surface-container-low transition-colors group">
                             <img alt="Google" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx1sNhWUQlVtWDc_V0HWUiMCR8RrN6HJJAZUTWAJPZlkDXd4nWS8s7JC73lBUBwbaVsNzZg1NybhQbb0l-YrCio9xUB9dbnqrVsdo12_ajnlehKLQ_DFdY3OcuDvLe_gkX4Mkj0ViIKPoTZSORDKhja3brRsM827pqAMsCgruutweFRPCe_f_fjcYF5dpk9dP1QDqBDwmxS3fqR2Dj8upbc6W2p_IXVUUNDfK0G8HP3ErwKmHn8slLDEMxPV5sZJiGqBdeNJN8VsPi" />
-                            <span class="font-label text-sm font-semibold text-on-surface">Continue with Google</span>
+                            <span class="font-label text-sm font-semibold text-on-surface">Masuk dengan Google</span>
                         </a>
                     </div>
                     <!-- Sign Up Link -->
                     <div class="mt-12 text-center">
                         <p class="text-secondary font-medium text-sm">
-                            Don't have an account?
-                            <button type="button" onclick="openRegisterModal()" class="text-primary font-bold hover:underline ml-1 bg-none border-none p-0 cursor-pointer">Sign Up here</button>
+                            Belum memiliki akun?
+                            <button type="button" onclick="openRegisterModal()" class="text-primary font-bold hover:underline ml-1 bg-none border-none p-0 cursor-pointer">Daftar Sekarang</button>
                         </p>
                     </div>
                 </div>
@@ -198,12 +198,13 @@
         <!-- Footer Shell Visibility: suppressed or simplified for login -->
         <footer class="mt-8 text-center">
             <div class="flex flex-wrap justify-center gap-6 mb-4">
-                <a class="text-xs font-label font-medium text-secondary hover:text-primary transition-colors" href="#">Privacy Policy</a>
-                <a class="text-xs font-label font-medium text-secondary hover:text-primary transition-colors" href="#">Terms of Service</a>
-                <a class="text-xs font-label font-medium text-secondary hover:text-primary transition-colors" href="#">Contact Support</a>
+                <a class="text-xs font-label font-medium text-secondary hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
+                <a class="text-xs font-label font-medium text-secondary hover:text-primary transition-colors" href="#">Syarat &amp; Ketentuan</a>
+                <a class="text-xs font-label font-medium text-secondary hover:text-primary transition-colors" href="#">Bantuan &amp; Dukungan</a>
             </div>
             <p class="text-[10px] font-label text-secondary/60 uppercase tracking-widest">
-                © 2024 Telkomsel Sacred Journey. All rights reserved.
+                &copy;2026 Telkomsel RoaMAX Haji. 
+                <br>Seluruh hak cipta dilindungi.
             </p>
         </footer>
     </main>
@@ -212,7 +213,7 @@
     <div id="registerModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-surface-container-lowest rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-gradient-to-r from-primary to-primary-container p-6 flex justify-between items-center z-10">
-                <h2 class="font-headline text-2xl font-bold text-on-primary">Create Account</h2>
+                <h2 class="font-headline text-2xl font-bold text-on-primary">Daftar Akun Baru</h2>
                 <button onclick="closeRegisterModal()" class="text-on-primary hover:opacity-80 transition-opacity">
                     <span class="material-symbols-outlined text-[28px]">close</span>
                 </button>
@@ -222,46 +223,46 @@
                 @csrf
                 <!-- Nama Field -->
                 <div class="space-y-2">
-                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="nama">Full Name</label>
+                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="nama">Nama Lengkap</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">person</span>
-                        <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="nama" name="nama" placeholder="Your Full Name" type="text" required />
+                        <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="nama" name="nama" placeholder="Masukkan nama lengkap Anda" type="text" required />
                     </div>
                 </div>
                 
                 <!-- Email Field -->
                 <div class="space-y-2">
-                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="reg-email">Email Address</label>
+                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="reg-email">Alamat Email</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">mail</span>
-                        <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="reg-email" name="email" placeholder="name@example.com" type="email" required />
+                        <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="reg-email" name="email" placeholder="pelanggan@gmail.com" type="email" required />
                     </div>
                 </div>
                 
                 <!-- Phone Field -->
                 <div class="space-y-2">
-                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="nomor_hp">Phone Number</label>
+                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="nomor_hp">Nomor Ponsel</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">phone</span>
-                        <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="nomor_hp" name="nomor_hp" placeholder="+62..." type="text" required />
+                        <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="nomor_hp" name="nomor_hp" placeholder="Contoh: 08123456789" type="text" required />
                     </div>
                 </div>
                 
                 <!-- Tempat Tugas Field -->
                 <div class="space-y-2">
-                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="tempat_tugas">Address</label>
+                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="tempat_tugas">Alamat Lengkap</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">location_on</span>
-                        <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="tempat_tugas" name="tempat_tugas" placeholder="Your Address" type="text" required />
+                        <input class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="tempat_tugas" name="tempat_tugas" placeholder="Masukkan alamat lengkap Anda" type="text" required />
                     </div>
                 </div>
                 
                 <!-- PIN Field -->
                 <div class="space-y-2">
-                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="new-pin">PIN (6+ digits)</label>
+                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="new-pin">Kata Sandi (PIN, min. 6 digit)</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">lock</span>
-                        <input class="w-full pl-12 pr-12 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="new-pin" name="pin" placeholder="••••••••" type="password" required />
+                        <input class="w-full pl-12 pr-12 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="new-pin" name="pin" placeholder="Masukkan PIN (min. 6 digit)" type="password" required />
                         <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant hover:text-secondary toggle-reg-pin-visibility" type="button">
                             <span class="material-symbols-outlined text-[20px]">visibility</span>
                         </button>
@@ -270,10 +271,10 @@
                 
                 <!-- PIN Confirmation Field -->
                 <div class="space-y-2">
-                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="pin-confirm">Confirm PIN</label>
+                    <label class="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider ml-1" for="pin-confirm">Ulangi Kata Sandi (PIN)</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors">lock_check</span>
-                        <input class="w-full pl-12 pr-12 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="pin-confirm" name="pin_confirmation" placeholder="••••••••" type="password" required />
+                        <input class="w-full pl-12 pr-12 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all outline-none text-on-surface placeholder:text-secondary/50" id="pin-confirm" name="pin_confirmation" placeholder="Masukkan ulang PIN Anda" type="password" required />
                         <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant hover:text-secondary toggle-reg-pin-confirm-visibility" type="button">
                             <span class="material-symbols-outlined text-[20px]">visibility</span>
                         </button>
@@ -285,7 +286,7 @@
                 
                 <!-- Submit Button -->
                 <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold rounded-lg shadow-lg hover:shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all duration-200 mt-6">
-                    Create Account
+                    Buat Akun Sekarang
                 </button>
             </form>
         </div>
@@ -367,7 +368,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Akun berhasil dibuat! Anda akan dialihkan ke halaman beranda.');
+                    alert('Akun berhasil dibuat! Anda akan diarahkan ke halaman utama.');
                     window.location.href = data.redirect;
                 } else {
                     displayRegisterErrors(data.errors || data.message);
@@ -375,7 +376,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                displayRegisterErrors('Terjadi kesalahan saat mendaftar. Silakan coba lagi.');
+                displayRegisterErrors('Terjadi kesalahan saat mendaftar. Mohon coba lagi beberapa saat.');
             });
         });
         

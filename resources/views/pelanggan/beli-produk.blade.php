@@ -29,7 +29,10 @@
             pointer-events: none;
         }
 
-        .page-header > * { position: relative; z-index: 1; }
+        .page-header>* {
+            position: relative;
+            z-index: 1;
+        }
 
         .page-header h1 {
             font-size: 1.8rem;
@@ -137,7 +140,9 @@
             font-size: 0.95rem;
         }
 
-        .form-label i { color: var(--tsel-primary); }
+        .form-label i {
+            color: var(--tsel-primary);
+        }
 
         .form-control {
             border: 1px solid var(--tsel-border);
@@ -277,33 +282,113 @@
 
         /* Mobile specific styling to make it compact */
         @media (max-width: 768px) {
-            .page-header { padding: 20px 15px; border-radius: 12px; }
-            .page-header h1 { font-size: 1.4rem; }
-            .page-header p { font-size: 0.85rem; }
+            .page-header {
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
 
-            .product-info-card { padding: 15px; border-radius: 12px; }
-            .product-showcase { padding: 15px; margin-bottom: 15px; }
-            .product-icon-large { width: 60px; height: 60px; font-size: 2rem; margin-bottom: 10px; }
-            .product-name-large { font-size: 1.25rem; margin-bottom: 5px; }
-            .product-price-large { font-size: 1.6rem; }
-            
-            .info-grid { grid-template-columns: 1fr; gap: 10px; }
-            .info-item { padding: 12px; display: flex; align-items: center; text-align: left; gap: 15px; border-radius: 10px; }
-            .info-item i { font-size: 1.6rem; margin-bottom: 0; }
-            .info-item div { flex: 1; }
-            .info-item-label { margin-bottom: 0; font-size: 0.8rem; }
-            .info-item-value { font-size: 1rem; }
+            .page-header h1 {
+                font-size: 1.4rem;
+            }
 
-            .purchase-form { padding: 15px; border-radius: 12px; }
-            .form-control { padding: 10px 12px; font-size: 0.95rem; }
-            .quantity-controls { justify-content: center; }
-            
-            .total-section { padding: 15px; margin: 20px 0; }
-            .total-label { font-size: 0.95rem; }
-            .total-amount { font-size: 1.8rem; }
+            .page-header p {
+                font-size: 0.85rem;
+            }
 
-            .btn-submit { padding: 12px 20px; font-size: 1rem; }
-            .btn-back { padding: 10px 20px; font-size: 0.95rem; }
+            .product-info-card {
+                padding: 15px;
+                border-radius: 12px;
+            }
+
+            .product-showcase {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .product-icon-large {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+
+            .product-name-large {
+                font-size: 1.25rem;
+                margin-bottom: 5px;
+            }
+
+            .product-price-large {
+                font-size: 1.6rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .info-item {
+                padding: 12px;
+                display: flex;
+                align-items: center;
+                text-align: left;
+                gap: 15px;
+                border-radius: 10px;
+            }
+
+            .info-item i {
+                font-size: 1.6rem;
+                margin-bottom: 0;
+            }
+
+            .info-item div {
+                flex: 1;
+            }
+
+            .info-item-label {
+                margin-bottom: 0;
+                font-size: 0.8rem;
+            }
+
+            .info-item-value {
+                font-size: 1rem;
+            }
+
+            .purchase-form {
+                padding: 15px;
+                border-radius: 12px;
+            }
+
+            .form-control {
+                padding: 10px 12px;
+                font-size: 0.95rem;
+            }
+
+            .quantity-controls {
+                justify-content: center;
+            }
+
+            .total-section {
+                padding: 15px;
+                margin: 20px 0;
+            }
+
+            .total-label {
+                font-size: 0.95rem;
+            }
+
+            .total-amount {
+                font-size: 1.8rem;
+            }
+
+            .btn-submit {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+
+            .btn-back {
+                padding: 10px 20px;
+                font-size: 0.95rem;
+            }
         }
     </style>
 
@@ -343,13 +428,14 @@
     <div class="purchase-form">
         <div class="alert-info-custom">
             <i class="fas fa-info-circle"></i>
-            <strong>Informasi:</strong> Pastikan jumlah pembelian sesuai kebutuhan Anda. Setelah transaksi diproses, tim kami akan menghubungi Anda untuk konfirmasi pembayaran.
+            <strong>Informasi:</strong> Pastikan pembelian sesuai kebutuhan Anda. Setelah transaksi diproses, tim kami
+            akan menghubungi Anda untuk konfirmasi paket telah aktif.
         </div>
 
         <form action="{{ route('pelanggan.transaksi.process') }}" method="POST" id="purchaseForm">
             @csrf
             <input type="hidden" name="produk_id" value="{{ $produk->id }}">
-            
+
             <div class="mb-4">
                 <label class="form-label">
                     <i class="fas fa-user"></i> Nama Pelanggan
@@ -364,7 +450,15 @@
                 <input type="email" class="form-control" value="{{ Auth::user()->email }}" readonly>
             </div>
 
-            <div class="mb-4">
+            <div class="form-group">
+                <label for="nomor_telepon" class="form-label">
+                    <i class="fas fa-phone"></i> Nomor Telepon Roaming
+                </label>
+                <input type="tel" name="nomor_telepon" id="nomor_telepon" class="form-control"
+                    placeholder="Contoh: 082123456789" pattern="[0-9]{10,13}" required>
+                <small class="text-muted">Masukkan nomor yang akan di-isi roaming (10-13 digit)</small>
+            </div>
+            {{-- <div class="mb-4">
                 <label class="form-label">
                     <i class="fas fa-shopping-basket"></i> Jumlah Pembelian
                 </label>
@@ -379,7 +473,7 @@
                 </div>
                 <input type="hidden" name="jumlah" id="jumlahInput" value="1">
                 <small class="text-muted">Maksimal pembelian: {{ $produk->produk_stok }} paket</small>
-            </div>
+            </div> --}}
 
             <div class="total-section text-center">
                 <div class="total-label">Total Pembayaran</div>
@@ -405,9 +499,9 @@
         function updateDisplay() {
             document.getElementById('quantityDisplay').textContent = currentQuantity;
             document.getElementById('jumlahInput').value = currentQuantity;
-            
+
             const totalPrice = basePrice * currentQuantity;
-            document.getElementById('totalAmount').textContent = 
+            document.getElementById('totalAmount').textContent =
                 'Rp ' + totalPrice.toLocaleString('id-ID');
         }
 
@@ -434,7 +528,7 @@
 
         document.getElementById('purchaseForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             Swal.fire({
                 title: 'Konfirmasi Pembelian',
                 html: `
