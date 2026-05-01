@@ -327,6 +327,11 @@ class PelangganController extends Controller
             'aktivasi_tanggal' => $transaksi->created_at->format('d/m/Y'),
         ];
 
+        // Return HTML untuk AJAX request (modal)
+        if (request()->ajax()) {
+            return view('pelanggan.nota-preview', ['formData' => $formData]);
+        }
+
         $pdf = Pdf::loadView('supvis.kwitansi', ['formData' => $formData])
             ->setPaper('A6', 'portrait');
 
