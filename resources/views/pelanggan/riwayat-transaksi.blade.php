@@ -1,4 +1,4 @@
-<x-pelanggan.layouts>
+﻿<x-pelanggan.layouts>
     <style>
         :root {
             --tsel-primary: #bc0007;
@@ -428,11 +428,9 @@
                             <span class="status-badge status-success">
                                 <i class="fas fa-check-circle"></i> Berhasil
                             </span>
-                            <a href="{{ route('pelanggan.transaksi.nota', ['id' => $transaksi->id, 'preview' => 1]) }}" 
-                               class="btn-download-nota" target="_blank"
-                               title="Lihat Nota">
+                            <button type="button" class="btn-download-nota btn-lihat-modal" data-transaksi-id="{{ $transaksi->id }}" title="Lihat Nota">
                                 <i class="fas fa-eye"></i> Lihat
-                            </a>
+                            </button>
                             <a href="{{ route('pelanggan.transaksi.nota', $transaksi->id) }}" 
                                class="btn-download-nota" 
                                title="Download Nota" style="background: #fdf2f2; border-color: #fca5a5;">
@@ -496,6 +494,90 @@
         });
     </script>
 
+    <!-- Modal Lihat Nota -->
+    <div class="modal fade" id="notaModal" tabindex="-1" aria-labelledby="notaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notaModalLabel">
+                        <i class="fas fa-receipt"></i> Detail Nota
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="notaContent" class="text-center">
+                        <div class="spinner-border text-danger" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle Lihat Modal
+        document.querySelectorAll('.btn-lihat-modal').forEach(button => {
+            button.addEventListener('click', function() {
+                const transaksiId = this.dataset.transaksiId;
+                const modal = new bootstrap.Modal(document.getElementById('notaModal'));
+                const notaContent = document.getElementById('notaContent');
+                
+                // Loading state
+                notaContent.innerHTML = '<div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div>';
+                
+                // Fetch nota content
+                const notaUrl = `{{ route('pelanggan.transaksi.nota', ':id') }}`.replace(':id', transaksiId);
+                fetch(notaUrl + '?preview=1')
+                    .then(html => {
+                        notaContent.innerHTML = html;
+                        modal.show();
+                    })
+                    .catch(error => {
+                        notaContent.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Gagal memuat nota</div>';
+                        console.error('Error:', error);
+                    });
+            });
+        });
+
+        // Konfirmasi batalkan transaksi dengan SweetAlert
+        document.querySelectorAll('.btn-cancel-transaction').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const form = this.closest('.cancel-form');
+                const produk = form.dataset.produk;
+                const jumlah = form.dataset.jumlah;
+                
+                Swal.fire({
+                    title: 'Batalkan Transaksi?',
+                    html: `
+                        <p>Anda akan membatalkan pembelian:</p>
+                        <strong>${jumlah} paket ${produk}</strong>
+                        <p class="mt-3" style="color: #28a745;">
+                            <i class="fas fa-undo"></i> Stok produk akan dikembalikan
+                        </p>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Batalkan!',
+                    cancelButtonText: 'Tidak',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+
 </x-pelanggan.layouts>
+
 
 
