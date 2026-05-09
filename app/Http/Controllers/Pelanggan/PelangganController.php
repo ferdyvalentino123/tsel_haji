@@ -49,7 +49,8 @@ class PelangganController extends Controller
     {
         $request->validate([
             'produk_id' => 'required|exists:produks,id',
-            'nomor_telepon' => 'required|regex:/^[0-9]{10,13}$/'
+            'nomor_telepon' => 'required|regex:/^[0-9]{10,13}$/',
+            'aktivasi_tanggal' => 'required|date|after_or_equal:today'
         ]);
 
         $produk = Produk::findOrFail($request->produk_id);
@@ -75,6 +76,7 @@ class PelangganController extends Controller
             $transaksi->nama_pelanggan = Auth::user()->name;
             $transaksi->telepon_pelanggan = $request->nomor_telepon;
             $transaksi->nomor_roaming = $request->nomor_telepon; // Nomor yang akan di-roaming
+            $transaksi->aktivasi_tanggal = $request->aktivasi_tanggal;
             $transaksi->tanggal_transaksi = now();
             $transaksi->save();
 
@@ -207,6 +209,22 @@ class PelangganController extends Controller
                 $transaksi->metode_pembayaran = ($status->payment_type ?? 'QRIS');
                 $transaksi->save();
                 
+                // Record Stock History for Sale (if not already recorded by notification handler)
+                $alreadyRecorded = \App\Models\StockHistory::where('product_id', $transaksi->produk_id)
+                    ->where('action', 'Penjualan (Online)')
+                    ->where('created_at', '>=', now()->subMinutes(5))
+                    ->exists();
+
+                if (!$alreadyRecorded && $transaksi->produk) {
+                    \App\Models\StockHistory::create([
+                        'product_id' => $transaksi->produk_id,
+                        'change_amount' => $transaksi->jumlah,
+                        'previous_stock' => $transaksi->produk->produk_stok + $transaksi->jumlah,
+                        'current_stock' => $transaksi->produk->produk_stok,
+                        'action' => 'Penjualan (Online)',
+                    ]);
+                }
+
                 return redirect()->route('pelanggan.riwayat-transaksi')
                     ->with('success', 'Pembayaran berhasil! Terima kasih atas pembelian Anda.');
             } else {
@@ -246,10 +264,32 @@ class PelangganController extends Controller
                 if ($fraudStatus == 'accept') {
                     $transaksi->status = 'lunas';
                     $transaksi->is_paid = true;
+                    
+                    // Record Stock History for Sale
+                    if ($transaksi->produk) {
+                        \App\Models\StockHistory::create([
+                            'product_id' => $transaksi->produk_id,
+                            'change_amount' => $transaksi->jumlah,
+                            'previous_stock' => $transaksi->produk->produk_stok + $transaksi->jumlah,
+                            'current_stock' => $transaksi->produk->produk_stok,
+                            'action' => 'Penjualan (Online)',
+                        ]);
+                    }
                 }
             } else if ($transactionStatus == 'settlement') {
                 $transaksi->status = 'lunas';
                 $transaksi->is_paid = true;
+
+                // Record Stock History for Sale
+                if ($transaksi->produk) {
+                    \App\Models\StockHistory::create([
+                        'product_id' => $transaksi->produk_id,
+                        'change_amount' => $transaksi->jumlah,
+                        'previous_stock' => $transaksi->produk->produk_stok + $transaksi->jumlah,
+                        'current_stock' => $transaksi->produk->produk_stok,
+                        'action' => 'Penjualan (Online)',
+                    ]);
+                }
             } else if ($transactionStatus == 'pending') {
                 $transaksi->status = 'pending';
             } else if ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
@@ -278,8 +318,18 @@ class PelangganController extends Controller
 
             $produk = Produk::find($transaksi->produk_id);
             if ($produk) {
+                $oldStock = $produk->produk_stok;
                 $produk->produk_stok += $transaksi->jumlah;
                 $produk->save();
+
+                // Record Stock History for Cancellation (Stock Restored)
+                \App\Models\StockHistory::create([
+                    'product_id' => $produk->id,
+                    'change_amount' => $transaksi->jumlah,
+                    'previous_stock' => $oldStock,
+                    'current_stock' => $produk->produk_stok,
+                    'action' => 'Pembatalan (Stok Kembali)',
+                ]);
             }
 
             $transaksi->status = 'batal';
@@ -310,8 +360,8 @@ class PelangganController extends Controller
         }
 
         $formData = [
-            'icon' => public_path('admin_asset/img/photos/icon_telkomsel.png'),
-            'logo' => public_path('admin_asset/img/photos/logo_telkomsel.png'),
+            'icon' => request()->ajax() ? asset('admin_asset/img/photos/icon_telkomsel.png') : public_path('admin_asset/img/photos/icon_telkomsel.png'),
+            'logo' => request()->ajax() ? asset('admin_asset/img/photos/logo_telkomsel.png') : public_path('admin_asset/img/photos/logo_telkomsel.png'),
             'id_transaksi' => $transaksi->id_transaksi,
             'produk_nama' => $produk->produk_nama,
             'produk_harga' => $produk->produk_harga,
@@ -323,8 +373,8 @@ class PelangganController extends Controller
             'telepon_pelanggan' => $transaksi->telepon_pelanggan,
             'nomor_telepon' => $transaksi->telepon_pelanggan,
             'metode_pembayaran' => 'QRIS/Midtrans',
-            'nomor_injeksi' => $transaksi->id_transaksi,
-            'aktivasi_tanggal' => $transaksi->created_at->format('d/m/Y'),
+            'nomor_injeksi' => $transaksi->telepon_pelanggan,
+            'aktivasi_tanggal' => \Carbon\Carbon::parse($transaksi->aktivasi_tanggal)->format('d/m/Y'),
         ];
 
         // Return HTML untuk AJAX request (modal)

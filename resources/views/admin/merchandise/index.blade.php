@@ -19,29 +19,57 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th>No</th>
-              <th>Nama</th>
-              <th>Harga</th>
+              <th style="width: 50px;">No</th>
+              <th>Nama Merchandise</th>
+              <th>Detail</th>
               <th>Stok</th>
-              <th>Aksi</th>
+              <th style="width: 150px;">Aksi</th>
             </tr>
           </thead>
           <tbody>
-            @forelse(\App\Models\Merchandise::paginate(15) as $item)
+            @forelse($merchandise as $item)
               <tr>
-                <td><strong>{{ $loop->iteration }}</strong></td>
-                <td><strong>{{ $item->merchandise_nama }}</strong></td>
-                <td><span class="badge bg-info">Rp {{ number_format($item->merchandise_harga ?? 0, 0, ",", ".") }}</span></td>
-                <td><span class="badge bg-success">{{ $item->merchandise_stok ?? 0 }}</span></td>
+                <td><strong>{{ ($merchandise->currentPage() - 1) * $merchandise->perPage() + $loop->iteration }}</strong></td>
                 <td>
-                  <a href="/programhaji/admin/merchandise/{{ $item->id }}/edit" class="btn btn-sm btn-warning">Edit</a>
+                  <div class="d-flex align-items-center">
+                    <div class="icon-circle bg-light me-3">
+                      <i class="fas fa-gift text-danger"></i>
+                    </div>
+                    <strong>{{ $item->merch_nama }}</strong>
+                  </div>
+                </td>
+                <td><small class="text-muted">{{ \Illuminate\Support\Str::limit($item->merch_detail, 50) }}</small></td>
+                <td>
+                  <span class="badge @if($item->merch_stok > 10) bg-success @else bg-warning @endif">
+                    {{ $item->merch_stok }} Unit
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <a href="{{ route('admin.merchandise.edit', $item->id) }}" class="btn btn-sm btn-outline-warning">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="{{ route('admin.merchandise.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus merchandise ini?')">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             @empty
-              <tr><td colspan="5" class="text-center py-3">Belum ada merchandise</td></tr>
+              <tr><td colspan="5" class="text-center py-5">
+                <img src="https://illustrations.popsy.co/red/empty-folder.svg" alt="Empty" style="width: 150px; opacity: 0.5;">
+                <p class="text-muted mt-3">Belum ada data merchandise.</p>
+              </td></tr>
             @endforelse
           </tbody>
         </table>
+      </div>
+      <div class="card-footer bg-white">
+        {{ $merchandise->links() }}
       </div>
     </div>
   </div>

@@ -24,9 +24,27 @@ class TransaksiController extends Controller
             });
         }
 
-        $transaksi = $query->paginate(20);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_pelanggan', 'LIKE', "%{$search}%")
+                  ->orWhere('nama_sales', 'LIKE', "%{$search}%")
+                  ->orWhere('id_transaksi', 'LIKE', "%{$search}%");
+            });
+        }
 
-        return view("admin.transaksi.index", compact("transaksi"));
+        // Clone query for totals calculation before pagination
+        $totalTransaksi = (clone $query)->count();
+        $totalPendapatan = (clone $query)->where(function($q) {
+            $q->where('is_paid', 1)->orWhereIn('status', ['lunas', 'success']);
+        })->sum('total_harga');
+        $totalDibayar = (clone $query)->where(function($q) {
+            $q->where('is_paid', 1)->orWhereIn('status', ['lunas', 'success']);
+        })->count();
+
+        $transaksi = $query->get();
+
+        return view("admin.transaksi.index", compact("transaksi", "totalTransaksi", "totalPendapatan", "totalDibayar"));
     }
 
     /**
@@ -40,6 +58,15 @@ class TransaksiController extends Controller
             $query->where(function ($q) use ($request) {
                 $q->whereDate('tanggal_transaksi', $request->date)
                   ->orWhereDate('created_at', $request->date);
+            });
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_pelanggan', 'LIKE', "%{$search}%")
+                  ->orWhere('nama_sales', 'LIKE', "%{$search}%")
+                  ->orWhere('id_transaksi', 'LIKE', "%{$search}%");
             });
         }
 
@@ -61,32 +88,47 @@ class TransaksiController extends Controller
 
         $callback = function () use ($transaksis) {
             $handle = fopen('php://output', 'w');
+            // Menambahkan BOM untuk UTF-8 dan instruksi separator agar Excel otomatis membagi kolom
             fwrite($handle, "\xEF\xBB\xBF");
+            fwrite($handle, "sep=,\n");
 
             fputcsv($handle, [
-                'No', 'ID Transaksi', 'Nama Pelanggan', 'No. Roaming', 'Nama Produk', 
-                'Total Harga (Rp)', 'Tanggal Transaksi', 'Status', 'Metode Pembayaran'
+                'No', 
+                'ID Transaksi', 
+                'Nama Pelanggan', 
+                'Nomor Telepon', 
+                'Nama Produk', 
+                'Total Bayar (Rp)', 
+                'Tanggal Transaksi', 
+                'Status Pembayaran', 
+                'Metode Pembayaran'
             ]);
 
             foreach ($transaksis as $i => $t) {
+                // Status mapping yang lebih rapi
                 if ($t->status === 'lunas' || $t->status === 'success' || $t->is_paid) {
-                    $status = 'Lunas';
+                    $status = 'LUNAS';
                 } elseif ($t->status === 'pending' || !$t->status) {
-                    $status = 'Pending';
+                    $status = 'PENDING';
+                } elseif ($t->status === 'batal') {
+                    $status = 'DIBATALKAN';
                 } else {
-                    $status = ucfirst($t->status);
+                    $status = strtoupper($t->status);
                 }
+
+                // Ambil nomor telepon dari transaksi atau profil
+                $nomorTelepon = $t->telepon_pelanggan ?: ($t->pelanggan->phone ?? '-');
 
                 fputcsv($handle, [
                     $i + 1,
                     $t->id_transaksi ?? $t->id,
                     $t->nama_pelanggan ?? '-',
-                    $t->nomor_roaming  ?? '-',
+                    $nomorTelepon,
                     $t->produk?->produk_nama ?? '-',
-                    number_format($t->total_harga ?? 0, 0, ',', '.'),
+                    $t->total_harga ?? 0, // Raw number lebih baik untuk perhitungan di Excel
                     $t->tanggal_transaksi ? Carbon::parse($t->tanggal_transaksi)->format('d/m/Y H:i') : '-',
                     $status,
-                    $t->metode_pembayaran ?? '-',
+                    strtoupper($t->metode_pembayaran ?? '-'),
                 ]);
             }
             fclose($handle);
@@ -130,6 +172,45 @@ class TransaksiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal memperbarui nomor roaming: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    /**
+     * Aktivasi paket oleh tim internal dengan mengunggah bukti injeksi.
+     */
+    public function aktivasi(Request $request, $id)
+    {
+        $request->validate([
+            'bukti_injeksi' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        try {
+            $transaksi = Transaksi::findOrFail($id);
+
+            if ($request->hasFile('bukti_injeksi')) {
+                $file = $request->file('bukti_injeksi');
+                // Simpan di folder public/bukti_injeksi agar mudah diakses
+                $path = $file->store('bukti_injeksi', 'public');
+                
+                $transaksi->bukti_injeksi = $path;
+                $transaksi->is_activated = 1;
+                $transaksi->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Paket berhasil diaktifkan dan bukti telah diunggah.'
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'File bukti injeksi tidak ditemukan.'
+            ], 400);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
     }

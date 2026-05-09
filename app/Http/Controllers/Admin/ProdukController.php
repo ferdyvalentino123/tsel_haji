@@ -8,9 +8,18 @@ use App\Http\Controllers\Controller;
 
 class ProdukController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $produk = Produk::latest()->paginate(15);
+        $search = $request->input('search');
+
+        $produk = Produk::when($search, function ($query, $search) {
+                $query->where('produk_nama', 'like', "%{$search}%")
+                      ->orWhere('produk_detail', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
         return view("admin.produk.index", compact("produk"));
     }
 
@@ -26,10 +35,19 @@ class ProdukController extends Controller
             "produk_harga" => "required|numeric|min:0",
             "produk_stok" => "required|integer|min:0",
             "produk_deskripsi" => "nullable|string",
-            "produk_kategori" => "nullable|string",
+            "produk_insentif" => "nullable|numeric|min:0",
         ]);
 
-        Produk::create($validated);
+        $produk = Produk::create($validated);
+
+        // Record History
+        \App\Models\StockHistory::create([
+            'product_id' => $produk->id,
+            'change_amount' => $produk->produk_stok,
+            'previous_stock' => 0,
+            'current_stock' => $produk->produk_stok,
+            'action' => 'Tambah (Initial)',
+        ]);
 
         return redirect("/programhaji/admin/produk")->with("success", "Produk berhasil ditambahkan");
     }
@@ -51,10 +69,23 @@ class ProdukController extends Controller
             "produk_harga" => "required|numeric|min:0",
             "produk_stok" => "required|integer|min:0",
             "produk_deskripsi" => "nullable|string",
-            "produk_kategori" => "nullable|string",
+            "produk_insentif" => "nullable|numeric|min:0",
         ]);
 
+        $oldStock = $produk->produk_stok;
+        $newStock = $validated['produk_stok'];
+
         $produk->update($validated);
+
+        if ($oldStock != $newStock) {
+            \App\Models\StockHistory::create([
+                'product_id' => $produk->id,
+                'change_amount' => abs($newStock - $oldStock),
+                'previous_stock' => $oldStock,
+                'current_stock' => $newStock,
+                'action' => $newStock > $oldStock ? 'Tambah (Update)' : 'Kurang (Update)',
+            ]);
+        }
 
         return redirect("/programhaji/admin/produk")->with("success", "Produk berhasil diperbarui");
     }

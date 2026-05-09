@@ -354,11 +354,14 @@
 
                     <div class="mb-5">
                         <label class="custom-form-label">
-                            <i class="fas fa-layer-group"></i> Kategori
+                            <i class="fas fa-hand-holding-usd"></i> Insentif per Produk
                         </label>
-                        <input type="text" name="produk_kategori" class="form-control custom-form-control @error('produk_kategori') is-invalid @enderror" 
-                               value="{{ old('produk_kategori', $produk->produk_kategori ?? '') }}" placeholder="Contoh: Internet, Talkmania, Combo">
-                        @error("produk_kategori") <small class="text-danger mt-2 d-block fw-bold">{{ $message }}</small> @enderror
+                        <div class="input-group">
+                            <span class="input-group-text custom">Rp</span>
+                            <input type="number" name="produk_insentif" class="form-control custom-form-control with-addon @error('produk_insentif') is-invalid @enderror" 
+                                   value="{{ old('produk_insentif', $produk->produk_insentif ?? '') }}" placeholder="Contoh: 5000">
+                        </div>
+                        @error("produk_insentif") <small class="text-danger mt-2 d-block fw-bold">{{ $message }}</small> @enderror
                     </div>
 
                     <div class="d-flex gap-3 flex-wrap">
@@ -377,8 +380,8 @@
     <!-- Illustration / Info Area Side -->
     <div class="col-lg-4 mb-4 mb-lg-0">
         <div class="info-side">
-            <div class="info-icon">
-                <i class="fas {{ isset($produk) ? 'fa-tools' : 'fa-box-open' }}"></i>
+            <div class="info-icon" style="background: transparent; box-shadow: none;">
+                <img src="{{ asset('admin_asset/img/photos/icon_telkomsel.png') }}" alt="Telkomsel" style="width: 120px; height: 120px; object-fit: contain;">
             </div>
             <h4 class="info-title">{{ isset($produk) ? "Atur Ulang Katalog" : "Tambah ke Etalase" }}</h4>
             <p class="info-desc">

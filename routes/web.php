@@ -19,6 +19,12 @@ Route::get('/programhaji/', function () {
 // Auth Routes (login, register, OAuth)
 require __DIR__ . '/auth.php';
 
+// Unified Profile Routes (for sales, supervisor, etc.)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/programhaji/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('role_users.edit');
+    Route::put('/programhaji/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('role_users.update');
+});
+
 // Admin Routes (auth + role:admin)
 require __DIR__ . '/admin.php';
 

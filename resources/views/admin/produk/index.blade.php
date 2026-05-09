@@ -37,13 +37,13 @@
               <th>Nama Produk</th>
               <th>Harga</th>
               <th>Stok</th>
-              <th>Kategori</th>
+              <th>Insentif</th>
               <th>Dibuat</th>
               <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
-            @forelse($produk ?? \App\Models\Produk::paginate(10) as $item)
+            @forelse($produk as $item)
               <tr>
                 <td><strong>{{ $loop->iteration }}</strong></td>
                 <td>
@@ -59,8 +59,16 @@
                     {{ $item->produk_stok }}
                   </span>
                 </td>
-                <td>{{ $item->produk_kategori ?? "-" }}</td>
-                <td>{{ $item->created_at?->format("d M Y") ?? "-" }}</td>
+                <td>
+                  <span class="badge bg-success">Rp {{ number_format($item->produk_insentif ?? 0, 0, ",", ".") }}</span>
+                </td>
+                <td>
+                  @if($item->created_at)
+                    {{ \Carbon\Carbon::parse($item->created_at)->locale('id')->isoFormat('D MMM YYYY') }}
+                  @else
+                    <span class="text-muted">-</span>
+                  @endif
+                </td>
                 <td>
                   <div class="btn-group btn-group-sm" role="group">
                     <a href="/programhaji/admin/produk/{{ $item->id }}/edit" class="btn btn-outline-warning" title="Edit">

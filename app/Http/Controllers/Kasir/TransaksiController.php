@@ -56,9 +56,40 @@ class TransaksiController extends Controller
                 throw new \Exception('Stok merchandise habis');
             }
             \DB::beginTransaction();
-            $selectedProduk->decrement('produk_stok', 1);
+
+            // Update Stok Produk
+            $selectedProduk->produk_stok -= 1;
+            $selectedProduk->save();
+
+            // Record Stock History for Product Sale
+            \App\Models\StockHistory::create([
+                'product_id' => $selectedProduk->id,
+                'change_amount' => 1,
+                'previous_stock' => $selectedProduk->produk_stok + 1,
+                'current_stock' => $selectedProduk->produk_stok,
+                'action' => 'Penjualan (Sales)',
+            ]);
+
+            // Update Stok Merchandise jika ada
+            if ($request->merchandise) {
+                $merch = \App\Models\Merchandise::find($request->merchandise);
+                if ($merch) {
+                    $oldMerchStock = $merch->merch_stok;
+                    $merch->merch_stok -= 1;
+                    $merch->save();
+
+                    // Record Stock History for Merchandise Sale
+                    \App\Models\StockHistory::create([
+                        'merchandise_id' => $merch->id,
+                        'change_amount' => 1,
+                        'previous_stock' => $oldMerchStock,
+                        'current_stock' => $merch->merch_stok,
+                        'action' => 'Penjualan (Sales)',
+                    ]);
+                }
+            }
+
             $selectedProduk->increment('produk_terjual', 1);
-            $selectedMerchandise->decrement('merch_stok', 1);
             $selectedMerchandise->increment('merch_terambil', 1);
             $history = json_decode($selectedProduk->produk_terjual_history ?? '[]', true);
             $history[] = [
@@ -88,13 +119,16 @@ class TransaksiController extends Controller
                 'nama_sales' => $request->nama_sales,
                 'tanggal_transaksi' => $request->tanggal_transaksi,
                 'jenis_paket' => $selectedProduk->id,
+                'produk_id' => $selectedProduk->id,
+                'total_harga' => $selectedProduk->produk_harga_akhir,
                 'merchandise' => $selectedMerchandise->merch_nama,
-                'metode_pembayaran' => $request->metode_pembayaran,
+                'metode_pembayaran' => $request->metode_pembayaran ?? 'Tunai',
                 'nomor_injeksi' => $request->nomor_injeksi,
+                'is_paid' => true,
                 'addon_perdana' => $request->has('addon_perdana') ? 1 : 0,
             ]);
             \DB::commit();
-            return redirect()->route('sales.home')->with('success', 'Transaksi berhasil disimpan!');
+            return redirect()->route('sales.transaksi')->with('success', 'Transaksi berhasil disimpan!');
         } catch (\Exception $e) {
             \DB::rollBack();
             return redirect()->back()
@@ -268,8 +302,8 @@ class TransaksiController extends Controller
 
         // Simpan ke session form_data
         $formData = [
-            'icon' => public_path('admin_asset/img/photos/icon_telkomsel.png'),
-            'logo' => public_path('admin_asset/img/photos/logo_telkomsel.png'),
+            'icon' => request()->ajax() ? asset('admin_asset/img/photos/icon_telkomsel.png') : public_path('admin_asset/img/photos/icon_telkomsel.png'),
+            'logo' => request()->ajax() ? asset('admin_asset/img/photos/logo_telkomsel.png') : public_path('admin_asset/img/photos/logo_telkomsel.png'),
             'id_transaksi' => $transaksi->id_transaksi,
             'produk_nama' => $selectedProduk->produk_nama,
             'produk_harga' => $selectedProduk->produk_harga,
@@ -283,7 +317,21 @@ class TransaksiController extends Controller
             'metode_pembayaran' => $transaksi->metode_pembayaran,
             'nomor_injeksi' => $transaksi->nomor_injeksi,
             'aktivasi_tanggal' => $transaksi->aktivasi_tanggal,
+            'addon_perdana' => $transaksi->addon_perdana,
         ];
+
+        if (request()->ajax()) {
+            return view('pelanggan.nota-preview', ['formData' => $formData]);
+        }
+
+        if (request()->query('action') === 'print-html') {
+            $formData['icon'] = asset('admin_asset/img/photos/icon_telkomsel.png');
+            $formData['logo'] = asset('admin_asset/img/photos/logo_telkomsel.png');
+            $view = view('supvis.kwitansi', ['formData' => $formData])->render();
+            // Fix untuk Android: Jangan gunakan window.close() pada onafterprint karena akan membatalkan dialog print
+            $view .= '<script>window.onload = function() { setTimeout(function() { window.print(); }, 500); }</script>';
+            return response($view);
+        }
 
         $pdf = Pdf::loadView('supvis.kwitansi', ['formData' => $formData])->setPaper('A6', 'portrait'); // Set A6 paper size in portrait orientation;
 
@@ -339,13 +387,34 @@ class TransaksiController extends Controller
             $allVoided = $groupedTransaksi->map(fn($items) => $items->every->trashed());
 
             // Ambil transaksi yang sudah disetor untuk nama sales ini
-            $setoranTransaksi = Transaksi::where('is_setor', true)
+            $setoranRaw = Transaksi::where('is_setor', true)
                 ->where('nama_sales', $nama_sales)
                 ->with('produk')
                 ->orderBy('tanggal_transaksi', 'desc')
                 ->get();
 
-            return view('sales/rekap', compact('groupedTransaksi', 'totalsPerDate', 'totalPenjualan', 'totalInsentif', 'allVoided', 'setoranTransaksi'));
+            // Kelompokkan setoran berdasarkan tanggal
+            $groupedSetoran = $setoranRaw->groupBy(function ($item) {
+                return Carbon::parse($item->tanggal_transaksi)->format('Y-m-d');
+            });
+
+            // Hitung total per tanggal untuk setoran
+            $setoranTotals = $groupedSetoran->map(function ($items) {
+                return [
+                    'totalPenjualan' => $items->sum(fn($item) => $item->produk ? $item->produk->produk_harga_akhir : 0),
+                    'totalInsentif' => $items->sum(fn($item) => $item->produk ? $item->produk->produk_insentif : 0),
+                ];
+            });
+
+            return view('sales/rekap', compact(
+                'groupedTransaksi', 
+                'totalsPerDate', 
+                'totalPenjualan', 
+                'totalInsentif', 
+                'allVoided', 
+                'groupedSetoran',
+                'setoranTotals'
+            ));
         }
 
         return redirect()->route('login')->withErrors(['role' => 'Anda harus login sebagai sales untuk mengakses halaman ini.']);
@@ -396,7 +465,7 @@ class TransaksiController extends Controller
         $totalPenjualan = $totalsPerDate->sum('totalPenjualan');
         $totalInsentif = $totalsPerDate->sum('totalInsentif');
 
-        return view('supvis/void', compact('groupedTransaksi', 'totalsPerDate', 'totalPenjualan', 'totalInsentif'));
+        return view('admin.void.index', compact('groupedTransaksi', 'totalsPerDate', 'totalPenjualan', 'totalInsentif'));
 
     }
 
@@ -749,7 +818,44 @@ class TransaksiController extends Controller
         if($request->ajax()){
             return response()->json(array('transaksi'=>$transaksi));
             }
-            return route('transaksi.approve', compact('transaksi'));        
+        return route('transaksi.approve', compact('transaksi'));        
+    }
+
+    public function setor(Request $request)
+    {
+        $date = $request->date;
+        $nama_sales = auth()->user()->name;
+
+        Transaksi::whereDate('tanggal_transaksi', $date)
+            ->where('nama_sales', $nama_sales)
+            ->where('is_setor', false)
+            ->update(['is_setor' => true]);
+
+        return response()->json(['success' => true]);       
+    }
+    
+    public function monitorSetoran(Request $request)
+    {
+        $transaksi = Transaksi::with(['produk', 'sales'])
+            ->orderBy('tanggal_transaksi', 'desc')
+            ->get();
+
+        $groupedData = $transaksi->groupBy(function ($item) {
+            return Carbon::parse($item->tanggal_transaksi)->format('Y-m-d');
+        })->map(function ($dateItems) {
+            return $dateItems->groupBy('nama_sales')->map(function ($salesItems) {
+                return [
+                    'total_sales' => $salesItems->sum(fn($i) => $i->produk ? $i->produk->produk_harga_akhir : 0),
+                    'total_insentif' => $salesItems->sum(fn($i) => $i->produk ? $i->produk->produk_insentif : 0),
+                    'total_setor' => $salesItems->where('is_setor', true)->sum(fn($i) => $i->produk ? $i->produk->produk_harga_akhir : 0),
+                    'total_pending' => $salesItems->where('is_setor', false)->sum(fn($i) => $i->produk ? $i->produk->produk_harga_akhir : 0),
+                    'count' => $salesItems->count(),
+                    'is_all_setor' => $salesItems->every('is_setor', true)
+                ];
+            });
+        });
+
+        return view('admin.setoran.index', compact('groupedData'));
     }
 
 }

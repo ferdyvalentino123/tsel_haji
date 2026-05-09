@@ -443,6 +443,14 @@
             <p><i class="fas fa-id-badge"></i> Pelanggan Telkomsel Roamax Haji</p>
         </div>
 
+        @if(session('warning'))
+        <div class="alert alert-warning alert-custom alert-dismissible fade show fade-in-up delay-1" role="alert" style="background-color: #fffbeb; color: #92400e; border-left: 6px solid #f59e0b;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>{{ session('warning') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
         @if(session('success'))
         <div class="alert alert-success alert-custom alert-dismissible fade show fade-in-up delay-1" role="alert">
             <i class="fas fa-check-circle"></i>
@@ -605,8 +613,8 @@
             }
         }
 
-        // Auto show edit mode if there are validation errors
-        @if($errors->any())
+        // Auto show edit mode if there are validation errors or warning
+        @if($errors->any() || session('warning'))
         document.addEventListener('DOMContentLoaded', function() {
             toggleEditMode();
         });

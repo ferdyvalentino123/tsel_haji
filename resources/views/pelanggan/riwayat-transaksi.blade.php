@@ -1,4 +1,4 @@
-﻿<x-pelanggan.layouts>
+<x-pelanggan.layouts>
     <style>
         :root {
             --tsel-primary: #bc0007;
@@ -328,6 +328,69 @@
             .btn-cancel { width: 100%; }
             .status-badge { width: 100%; }
         }
+
+        /* Premium Modal Receipt Styles */
+        .modal-receipt .modal-content {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+        }
+
+        .modal-receipt .modal-header {
+            background: linear-gradient(135deg, var(--tsel-primary) 0%, var(--tsel-primary-light) 100%);
+            color: #fff;
+            border: none;
+            padding: 20px 25px;
+        }
+
+        .modal-receipt .modal-title {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-receipt .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+
+        .modal-receipt .modal-body {
+            background: #f4f6f8;
+            padding: 25px;
+        }
+
+        #notaContent {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            position: relative;
+            min-height: 300px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-receipt .modal-footer {
+            border-top: 1px solid #eee;
+            padding: 15px 25px;
+            background: #fff;
+        }
+
+        .btn-print-nota {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-print-nota:hover {
+            background: #eee;
+            color: #000;
+        }
     </style>
 
     <!-- Page Header -->
@@ -354,7 +417,7 @@
             <div class="summary-card pending">
                 <i class="fas fa-clock"></i>
                 <div class="summary-value">{{ $transaksis->where('status', 'pending')->count() }}</div>
-                <div class="summary-label">Menunggu Konfirmasi</div>
+                <div class="summary-label">Menunggu Pembayaran</div>
             </div>
             <div class="summary-card success">
                 <i class="fas fa-check-circle"></i>
@@ -382,18 +445,21 @@
                         <i class="fas fa-sim-card"></i>
                     </div>
                     <div class="info-content">
-                        <div class="info-label">Produk</div>
+                        <div class="info-label">Paket</div>
                         <div class="info-value">{{ $transaksi->produk->produk_nama ?? 'Produk Tidak Ditemukan' }}</div>
+                        <div class="info-label mt-1" style="font-size: 0.7rem; opacity: 0.8;">
+                            <i class="fas fa-calendar-check me-1"></i> Aktivasi: {{ \Carbon\Carbon::parse($transaksi->aktivasi_tanggal)->translatedFormat('d M Y') }}
+                        </div>
                     </div>
                 </div>
 
                 <div class="transaction-info">
                     <div class="info-icon">
-                        <i class="fas fa-shopping-basket"></i>
+                        <i class="fas fa-mobile-alt"></i>
                     </div>
                     <div class="info-content">
-                        <div class="info-label">Jumlah</div>
-                        <div class="info-value">{{ $transaksi->jumlah }} Paket</div>
+                        <div class="info-label">Nomor Injeksi</div>
+                        <div class="info-value">{{ $transaksi->telepon_pelanggan }}</div>
                     </div>
                 </div>
             </div>
@@ -424,18 +490,33 @@
                             </button>
                         </form>
                     @elseif($transaksi->status == 'success' || $transaksi->status == 'lunas')
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <span class="status-badge status-success">
-                                <i class="fas fa-check-circle"></i> Berhasil
-                            </span>
-                            <button type="button" class="btn-download-nota btn-lihat-modal" data-transaksi-id="{{ $transaksi->id }}" title="Lihat Nota">
-                                <i class="fas fa-eye"></i> Lihat
-                            </button>
-                            <a href="{{ route('pelanggan.transaksi.nota', $transaksi->id) }}" 
-                               class="btn-download-nota" 
-                               title="Download Nota" style="background: #fdf2f2; border-color: #fca5a5;">
-                                <i class="fas fa-file-pdf text-danger"></i> Download
-                            </a>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            @if(!$transaksi->is_activated)
+                                <div class="d-flex flex-column align-items-end">
+                                    <span class="status-badge" style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
+                                        <i class="fas fa-hourglass-half"></i> Menunggu Aktivasi
+                                    </span>
+                                    <small class="text-muted" style="font-size: 0.65rem; margin-top: 2px;">
+                                        <i class="fas fa-info-circle"></i> Proses tim 1x24 jam
+                                    </small>
+                                </div>
+                            @else
+                                <span class="status-badge status-success">
+                                    <i class="fas fa-check-circle"></i> Berhasil
+                                </span>
+                            @endif
+
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn-download-nota btn-lihat-modal" data-transaksi-id="{{ $transaksi->id }}" title="Lihat Nota">
+                                    <i class="fas fa-receipt"></i> Detail Nota
+                                </button>
+                                
+                                @if($transaksi->is_activated && $transaksi->bukti_injeksi)
+                                <button type="button" class="btn-download-nota" style="background: #e3f2fd; color: #0d47a1;" onclick="viewBuktiInjeksi('{{ asset('storage/' . $transaksi->bukti_injeksi) }}')">
+                                    <i class="fas fa-file-invoice"></i> Bukti Injeksi
+                                </button>
+                                @endif
+                            </div>
                         </div>
                     @else
                         <span class="status-badge status-failed">
@@ -459,60 +540,29 @@
         </div>
     @endif
 
-    <script>
-        // Konfirmasi batalkan transaksi dengan SweetAlert
-        document.querySelectorAll('.btn-cancel-transaction').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const form = this.closest('.cancel-form');
-                const produk = form.dataset.produk;
-                const jumlah = form.dataset.jumlah;
-                
-                Swal.fire({
-                    title: 'Batalkan Transaksi?',
-                    html: `
-                        <p>Anda akan membatalkan pembelian:</p>
-                        <strong>${jumlah} paket ${produk}</strong>
-                        <p class="mt-3" style="color: #28a745;">
-                            <i class="fas fa-undo"></i> Stok produk akan dikembalikan
-                        </p>
-                    `,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Batalkan!',
-                    cancelButtonText: 'Tidak',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-    </script>
-
     <!-- Modal Lihat Nota -->
     <div class="modal fade" id="notaModal" tabindex="-1" aria-labelledby="notaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-receipt">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="notaModalLabel">
-                        <i class="fas fa-receipt"></i> Detail Nota
+                        <i class="fas fa-receipt"></i> Detail Nota Transaksi
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="notaContent" class="text-center">
-                        <div class="spinner-border text-danger" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
+                    <div id="notaContent">
+                        <!-- Content will be loaded here -->
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <a href="#" id="btnDownloadPDF" class="btn btn-print-nota text-danger" title="Download PDF">
+                        <i class="fas fa-file-pdf"></i> Download
+                    </a>
+                    <!-- <button type="button" class="btn btn-print-nota" onclick="window.print()">
+                        <i class="fas fa-print"></i> Cetak
+                    </button> -->
                 </div>
             </div>
         </div>
@@ -520,26 +570,58 @@
 
     <script>
         // Handle Lihat Modal
+        let notaModalInstance = null;
+        
         document.querySelectorAll('.btn-lihat-modal').forEach(button => {
             button.addEventListener('click', function() {
                 const transaksiId = this.dataset.transaksiId;
-                const modal = new bootstrap.Modal(document.getElementById('notaModal'));
+                const modalElement = document.getElementById('notaModal');
                 const notaContent = document.getElementById('notaContent');
+                const btnDownloadPDF = document.getElementById('btnDownloadPDF');
+                
+                // Set download URL
+                const downloadUrl = `{{ route('pelanggan.transaksi.nota', ':id') }}`.replace(':id', transaksiId);
+                btnDownloadPDF.href = downloadUrl;
+                
+                if (!notaModalInstance) {
+                    notaModalInstance = new bootstrap.Modal(modalElement);
+                }
                 
                 // Loading state
-                notaContent.innerHTML = '<div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div>';
+                notaContent.innerHTML = `
+                    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+                        <div class="spinner-border text-danger mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted">Menyiapkan nota Anda...</p>
+                    </div>
+                `;
+                
+                notaModalInstance.show();
                 
                 // Fetch nota content
                 const notaUrl = `{{ route('pelanggan.transaksi.nota', ':id') }}`.replace(':id', transaksiId);
-                fetch(notaUrl + '?preview=1')
-                    .then(html => {
-                        notaContent.innerHTML = html;
-                        modal.show();
-                    })
-                    .catch(error => {
-                        notaContent.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Gagal memuat nota</div>';
-                        console.error('Error:', error);
-                    });
+                fetch(notaUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(html => {
+                    notaContent.innerHTML = html;
+                })
+                .catch(error => {
+                    notaContent.innerHTML = `
+                        <div class="alert alert-danger m-4 text-center">
+                            <i class="fas fa-exclamation-circle d-block mb-2" style="font-size: 2rem;"></i>
+                            Gagal memuat nota. Silakan coba lagi nanti.
+                        </div>
+                    `;
+                    console.error('Error:', error);
+                });
             });
         });
 
@@ -575,8 +657,23 @@
                 });
             });
         });
-    </script>
 
+        function viewBuktiInjeksi(url) {
+            Swal.fire({
+                title: 'Bukti Injeksi Paket',
+                imageUrl: url,
+                imageAlt: 'Bukti Injeksi',
+                width: 'auto',
+                padding: '1em',
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'rounded-4 shadow-lg',
+                    image: 'img-fluid rounded-3 border'
+                }
+            });
+        }
+    </script>
 </x-pelanggan.layouts>
 
 

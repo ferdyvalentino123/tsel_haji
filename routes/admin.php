@@ -29,11 +29,19 @@ Route::middleware(['auth', 'admin'])->prefix('programhaji/admin')->group(functio
         Route::get('/export', [TransaksiController::class, 'exportExcel'])->name('export');
         Route::get('/{transaksi}', [TransaksiController::class, 'show'])->name('show');
         Route::patch('/{id}/roaming', [TransaksiController::class, 'updateRoaming'])->name('update-roaming');
+        Route::post('/{id}/aktivasi', [TransaksiController::class, 'aktivasi'])->name('aktivasi');
     });
 
     // Users Management (mapped to RoleUsersController)
     Route::resource('users', RoleUsersController::class, ['as' => 'admin']);
     // Backup route name if needed
     Route::resource('role-users', RoleUsersController::class, ['as' => 'admin']);
+
+    // Monitoring & Financial Audit
+    Route::prefix('monitor')->name('admin.monitor.')->group(function () {
+        Route::get('/setoran', [\App\Http\Controllers\Kasir\TransaksiController::class, 'monitorSetoran'])->name('setoran');
+        Route::get('/void', [\App\Http\Controllers\Kasir\TransaksiController::class, 'supvisvoid'])->name('void');
+        Route::delete('/void/{id}', [\App\Http\Controllers\Kasir\TransaksiController::class, 'supvisdestroy'])->name('destroy');
+    });
 
 });

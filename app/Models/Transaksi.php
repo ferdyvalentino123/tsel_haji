@@ -51,6 +51,7 @@ class Transaksi extends Model
         'total_harga', // Field untuk total harga
         'status', // Field untuk status transaksi
         'snap_token', // Field untuk menyimpan Snap token
+        'bukti_injeksi', // Field untuk menyimpan path file bukti injeksi dari tim
     ];
 
     // Relasi ke Produk

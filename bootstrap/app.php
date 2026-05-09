@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'kasir' => App\Http\Middleware\EnsureKasir::class,
             'sales' => App\Http\Middleware\EnsureSales::class,
             'pelanggan' => App\Http\Middleware\PelangganMiddleware::class,
+            'complete_profile' => App\Http\Middleware\EnsureProfileCompleted::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -21,6 +21,6 @@ class saleslayouts extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.sales.layouts');
+        return view('components.Sales.SalesLayouts');
     }
 }

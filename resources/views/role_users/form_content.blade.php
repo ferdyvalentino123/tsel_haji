@@ -1,6 +1,3 @@
-@extends('admin.layout')
-@section('title', isset($user) ? 'Edit Pengguna' : 'Tambah Pengguna')
-@section('content')
 <style>
   .glass-card {
     background: #fff;
@@ -27,10 +24,12 @@
     font-weight: 800;
     margin: 0;
     letter-spacing: -0.5px;
+    color: #fff !important;
   }
   .form-subtitle {
     font-size: 0.9rem;
     opacity: 0.8;
+    color: #fff !important;
   }
   
   .input-label {
@@ -61,14 +60,11 @@
     background-color: transparent;
   }
   
-  /* Animasi hover input border merah */
   .input-group:focus-within .input-group-text,
   .input-group:focus-within .form-control,
   .input-group:focus-within .form-select {
     border-color: #bc0007;
   }
-
-
 
   .btn-submit {
     background: #bc0007;
@@ -98,7 +94,6 @@
     color: #333;
   }
 
-  /* Responsivitas form actions saat mobile menumpuk sejajar */
   @media (max-width: 991px) {
     .btn-submit, .btn-cancel {
         width: 100%;
@@ -107,44 +102,39 @@
   }
 </style>
 
-<div class="mb-4">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb bg-transparent p-0 m-0">
-      <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}" class="text-decoration-none text-muted">Manajemen Pengguna</a></li>
-      <li class="breadcrumb-item active fw-bold" aria-current="page">{{ isset($user) ? 'Edit Pengguna' : 'Tambah Pengguna' }}</li>
-    </ol>
-  </nav>
-</div>
-
 <div class="glass-card mb-5">
   <div class="form-header-bg">
     <h1 class="form-title">
-        <i class="fas {{ isset($user) ? 'fa-user-edit' : 'fa-user-plus' }} me-2"></i> 
-        {{ isset($user) ? 'Edit Profil Pengguna' : 'Buat Pengguna Baru' }}
+        <i class="fas fa-user-edit me-2"></i> 
+        Edit Profil Pengguna
     </h1>
     <div class="form-subtitle">Lengkapi detail akun dengan informasi privasi dan *role* yang sesuai</div>
   </div>
 
-  <form action="{{ isset($user) ? route('admin.users.update', $user->id) : route('admin.users.store') }}" method="POST">
+  <form action="{{ route('role_users.update') }}" method="POST">
     @csrf
-    @if(isset($user))
-        @method('PUT')
-    @endif
+    @method('PUT')
     
     <div class="card-body p-4 p-md-5">
       <div class="row g-5">
         
-        <!-- FORM TUNGGAL CENTERED -->
         <div class="col-lg-8 mx-auto">
             <h5 class="mb-4 text-dark fw-bold border-bottom pb-2">Kredensial & Informasi Akun</h5>
             
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             <!-- Nama Input -->
             <div class="mb-4">
                 <label class="input-label">Nama Lengkap</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-user"></i></span>
-                    <input type="text" name="name" class="form-control hover-input @error('name') is-invalid @enderror" 
-                           placeholder="Cth: Ahmad Fulan" value="{{ old('name', $user->name ?? '') }}" required>
+                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" 
+                           placeholder="Cth: Ahmad Fulan" value="{{ old('name', $roleUsers->name) }}" required>
                 </div>
                 @error('name')<div class="text-danger small mt-1 fw-bold">{{ $message }}</div>@enderror
             </div>
@@ -156,7 +146,7 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                         <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
-                               placeholder="email@contoh.com" value="{{ old('email', $user->email ?? '') }}" required>
+                               placeholder="email@contoh.com" value="{{ old('email', $roleUsers->email) }}" required>
                     </div>
                     @error('email')<div class="text-danger small mt-1 fw-bold">{{ $message }}</div>@enderror
                 </div>
@@ -165,7 +155,7 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-phone-alt"></i></span>
                         <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" 
-                               placeholder="081234xxxx" value="{{ old('phone', $user->phone ?? '') }}">
+                               placeholder="081234xxxx" value="{{ old('phone', $roleUsers->phone) }}">
                     </div>
                     @error('phone')<div class="text-danger small mt-1 fw-bold">{{ $message }}</div>@enderror
                 </div>
@@ -175,28 +165,11 @@
             <div class="row mb-4">
                 <div class="col-md-6 mb-4 mb-md-0">
                     <label class="input-label">Role Akses</label>
-                    @if(isset($user) && Auth::id() === $user->id)
-                        {{-- Admin tidak bisa mengubah role-nya sendiri --}}
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
-                            <input type="text" class="form-control bg-light" value="{{ ucfirst($user->role) }}" disabled>
-                            <input type="hidden" name="role" value="{{ $user->role }}">
-                        </div>
-                        <small class="text-muted fst-italic mt-1 d-block"><i class="fas fa-lock"></i> Role tidak dapat diubah untuk akun sendiri.</small>
-                    @else
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
-                            <select name="role" class="form-select @error('role') is-invalid @enderror" required>
-                                <option value="">-- Pilih Akses --</option>
-                                <option value="supervisor" {{ old('role', $user->role ?? '') === 'supervisor' ? 'selected' : '' }}>Admin (Supervisor)</option>
-                                <option value="sales" {{ old('role', $user->role ?? '') === 'sales' ? 'selected' : '' }}>Sales</option>
-                                <option value="kasir" {{ old('role', $user->role ?? '') === 'kasir' ? 'selected' : '' }}>Kasir</option>
-                                <option value="pelanggan" {{ old('role', $user->role ?? '') === 'pelanggan' ? 'selected' : '' }}>Pelanggan</option>
-                                <option value="travel" {{ old('role', $user->role ?? '') === 'travel' ? 'selected' : '' }}>Biro Travel</option>
-                            </select>
-                        </div>
-                        @error('role')<div class="text-danger small mt-1 fw-bold">{{ $message }}</div>@enderror
-                    @endif
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                        <input type="text" class="form-control bg-light" value="{{ ucfirst($roleUsers->role) }}" disabled>
+                    </div>
+                    <small class="text-muted fst-italic mt-1 d-block"><i class="fas fa-lock"></i> Role tidak dapat diubah untuk akun sendiri.</small>
                 </div>
 
                 <div class="col-md-6">
@@ -204,21 +177,19 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
                         <input type="password" name="pin" class="form-control @error('pin') is-invalid @enderror" 
-                               {{ isset($user) ? '' : 'required' }} placeholder="Min. 6 karakter PIN" minlength="6">
+                               placeholder="Min. 6 karakter PIN" minlength="6">
                     </div>
-                    @if(isset($user))
-                        <small class="text-muted fst-italic mt-1 d-block"><i class="fas fa-info-circle"></i> Kosongkan jika PIN tidak ingin diubah. Min. 6 karakter.</small>
-                    @endif
+                    <small class="text-muted fst-italic mt-1 d-block"><i class="fas fa-info-circle"></i> Kosongkan jika PIN tidak ingin diubah. Min. 6 karakter.</small>
                     @error('pin')<div class="text-danger small mt-1 fw-bold">{{ $message }}</div>@enderror
                 </div>
             </div>
 
-            <!-- Tombol Aksi Desktop & Mobile -->
+            <!-- Tombol Aksi -->
             <div class="d-flex flex-column flex-lg-row gap-3 mt-5">
                 <button type="submit" class="btn-submit text-center">
-                    <i class="fas fa-paper-plane me-2"></i> {{ isset($user) ? 'Simpan Perubahan Profil' : 'Buat Akun Sekarang' }}
+                    <i class="fas fa-paper-plane me-2"></i> Simpan Perubahan Profil
                 </button>
-                <a href="{{ route('admin.users.index') }}" class="btn-cancel text-center text-decoration-none">
+                <a href="{{ url()->previous() }}" class="btn-cancel text-center text-decoration-none">
                     Kembali
                 </a>
             </div>
@@ -228,4 +199,3 @@
     </div>
   </form>
 </div>
-@endsection

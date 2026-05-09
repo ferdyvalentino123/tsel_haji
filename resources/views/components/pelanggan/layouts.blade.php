@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telkomsel Roamax Haji - Portal Pelanggan</title>
+    <title>Portal Pelanggan - Telkomsel RoaMAX Haji</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -266,7 +266,7 @@
         <div class="container">
             <a class="navbar-brand" href="{{ route('pelanggan.home') }}">
                 <i class="fas fa-mosque"></i>
-                Telkomsel Roamax Haji
+                Telkomsel RoaMAX Haji
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
                     style="border-color: rgba(255,255,255,0.5);">

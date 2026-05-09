@@ -13,7 +13,7 @@ class EnsureSupervisor
      */
     public function handle(Request $request, Closure $next): mixed
     {
-        if (Auth::check() && Auth::user()->role === 'supervisor') {
+        if (Auth::check() && in_array(Auth::user()->role, ['supervisor', 'admin'])) {
             return $next($request);
         }
 

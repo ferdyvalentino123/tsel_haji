@@ -1,290 +1,348 @@
 <x-Sales.SalesLayouts>
 
     <head>
-
         <style>
-            body {
-                background-color: #f4f4f9;
-                margin: 0;
-                padding: 0;
+            .transaksi-container {
+                max-width: 900px;
+                margin: 0 auto;
             }
-
-            .container {
-                max-width: 1000px;
-                margin: 30px auto;
-                background: none;
-                border-radius: 0;
-                overflow: visible;
-                box-shadow: none;
-            }
-
-            .header {
-                text-align: right;
-                background: linear-gradient(45deg, #2575FC, #00C853);
-                color: #fff;
-                padding: 15px 25px;
-                font-size: 20px;
-            }
-
-            .title {
-                text-align: center;
-                margin: 25px 0;
-                font-size: 23px;
-                font-weight: bold;
-                color: #333;
-            }
-
-            form {
-                padding: 30px;
-            }
-
-            .form-group {
+            .section-card {
+                background: white;
+                border-radius: 15px;
+                padding: 25px;
                 margin-bottom: 25px;
+                border: 1px solid #edf2f7;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             }
-
-            .form-group label {
+            .section-title {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #bc0007;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border-bottom: 2px solid #f8f9fa;
+                padding-bottom: 10px;
+            }
+            .form-label {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #4a5568;
+                margin-bottom: 8px;
                 display: block;
-                font-size: 14px;
-                margin-bottom: 10px;
-                color: #333;
             }
-
-            .form-group input,
-            .form-group select {
-                width: 100%;
-                padding: 12px;
-                font-size: 13px;
-                border: 1px solid #ccc;
-                border-radius: 6px;
-                box-sizing: border-box;
+            .form-control {
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+                transition: all 0.2s;
+                background-color: #f8fafc;
             }
-
-            .checkbox-group {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 15px;
-                padding: 10px;
-            }
-
-            .checkbox-box {
-                display: flex;
-                align-items: center;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                background-color: #fefefe;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                cursor: pointer;
-                transition: 0.3s;
-            }
-
-            .checkbox-box:hover {
-                border-color: #2575FC;
-                background: linear-gradient(45deg, #2575FC, #00C853);
-                box-shadow: 0 4px 8px rgba(0, 86, 179, 0.2);
-            }
-
-            .checkbox-box input {
-                display: none;
-            }
-
-            .checkbox-box label {
-                display: flex;
-                align-items: center;
-                font-size: 8px;
-                font-weight: bold;
-                cursor: pointer;
-                color: #333;
-                flex-grow: 1;
-            }
-
-            .checkbox-icon {
-                display: inline-block;
-                width: 20px;
-                height: 20px;
-                margin-right: 10px;
-                border: 2px solid #ccc;
-                border-radius: 4px;
+            .form-control:focus {
                 background-color: #fff;
+                border-color: #bc0007;
+                box-shadow: 0 0 0 3px rgba(188, 0, 7, 0.1);
+                outline: none;
+            }
+            .package-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            .package-item {
                 position: relative;
-                transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
+                cursor: pointer;
+            }
+            .package-item input {
+                position: absolute;
+                opacity: 0;
+            }
+            .package-box {
+                border: 2px solid #edf2f7;
+                border-radius: 12px;
+                padding: 20px;
+                transition: all 0.2s;
+                height: 100%;
+                background: #fff;
+            }
+            .package-item:hover .package-box {
+                border-color: #bc0007;
+                transform: translateY(-2px);
+            }
+            .package-item input:checked + .package-box {
+                border-color: #bc0007;
+                background-color: #fff8f8;
+                box-shadow: 0 10px 15px -3px rgba(188, 0, 7, 0.1);
+            }
+            .package-name {
+                font-weight: 700;
+                color: #2d3748;
+                margin-bottom: 5px;
+                display: block;
+            }
+            .package-price {
+                font-size: 1.1rem;
+                font-weight: 800;
+                color: #bc0007;
+                display: block;
+                margin-top: 10px;
+            }
+            .btn-action {
+                padding: 14px 40px;
+                border-radius: 12px;
+                font-weight: 700;
+                transition: all 0.2s;
+            }
+            .btn-primary-tsel {
+                background-color: #bc0007;
+                color: white;
+                border: none;
+                box-shadow: 0 4px 14px rgba(188, 0, 7, 0.3);
+            }
+            .btn-primary-tsel:hover {
+                background-color: #8a0005;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 20px rgba(188, 0, 7, 0.4);
+            }
+            .addon-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 20px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 50px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .addon-pill input:checked + span {
+                color: #bc0007;
+                font-weight: 700;
+            }
+            .addon-pill:has(input:checked) {
+                border-color: #bc0007;
+                background: #fff8f8;
             }
 
-            input:checked+label .checkbox-icon {
-                background: linear-gradient(45deg, #2575FC, #00C853);
-                border-color: #2575FC;
+            @media (max-width: 768px) {
+                .section-card {
+                    padding: 15px;
+                }
+                .btn-action {
+                    padding: 12px 20px;
+                    width: 100%;
+                    font-size: 0.9rem;
+                }
+                .transaksi-container {
+                    padding: 0 10px;
+                }
+                .section-title {
+                    font-size: 1rem;
+                }
+            }
+            .package-item.disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+            .package-item.disabled .package-box {
+                background-color: #f1f5f9;
+                border-color: #e2e8f0;
+                filter: grayscale(1);
+            }
+            .highlight .package-box {
+                border-color: #edf2f7;
+                background-color: #fff;
+            }
+            /* Styling khusus saat terpilih (checked) */
+            .package-item input:checked + .package-box {
+                border-color: #bc0007 !important;
+                background-color: #fff8f8 !important;
+                box-shadow: 0 10px 15px -3px rgba(188, 0, 7, 0.1);
+            }
+            .payment-icon {
+                width: 45px;
+                height: 45px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+            }
+            .package-item:hover .payment-icon {
                 transform: scale(1.1);
             }
-
-            input:checked+label .checkbox-icon::after {
-                content: '✔';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                color: #fff;
-                font-size: 10px;
-                font-weight: bold;
+            .bg-success-subtle {
+                background-color: rgba(40, 167, 69, 0.1) !important;
             }
-
-
-            button[type="submit"] {
-                padding: 10px 20px;
-                margin-right: 10px;
-                font-size: 16px;
-                border: none;
-                background-color: #2575FC;
-                color: white;
-                border-radius: 5px;
-                cursor: pointer;
+            .bg-primary-subtle {
+                background-color: rgba(13, 110, 253, 0.1) !important;
             }
-
-            button[type="button"] {
-                padding: 10px 20px;
-                font-size: 16px;
-                border: none;
-                background-color: #00C853;
-                color: white;
-                border-radius: 5px;
-                cursor: pointer;
-            }
-
-            button[type="submit"]:hover {
-                background-color: #0056b3;
-            }
-
-            button[type="button"]:hover {
-                background-color: #009624;
-            }
-
-            .checkbox-box.highlight {
-                background-color: #f0f9ff;
-                border: 2px solid #00C853;
-            }
-
-        
-        /* ✅ Tampilan HP (<= 600px) */
-@media (max-width: 600px) {
-    .card {
-        max-width: 100%; /* Supaya card pas di layar */
-    }
-}
-
         </style>
     </head>
 
     <body>
-        <div class="container">
-            <div>
-                <img src="{{ asset('admin_asset/img/photos/logo_telkomsel.png') }}" alt="Logo Telkomsel"
-                    style="height: 40px; width: auto; filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.1));">
+        <div class="transaksi-container py-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-0">Input Transaksi</h2>
+                    <p class="text-muted small mb-0">Lengkapi data di bawah untuk memproses pesanan</p>
+                </div>
+                <img src="{{ asset('admin_asset/img/photos/logo_telkomsel.png') }}" alt="Logo" style="height: 35px;">
             </div>
-            <div class="card mt-5" style="width: 50rem;">
-            <div class="title">TRANSAKSI PEMBAYARAN</div>
-            <form action="{{ route('sales/transaksi/submit') }}" method="POST" formtarget="_blank" target="_blank">
+
+            <form action="{{ route('sales/transaksi/submit') }}" method="POST" id="transaksiForm">
                 @csrf
-                <div class="form-group">
-                    @php $id_transaksi = 'T' . str_pad(Auth::user()->id, 3, '0', STR_PAD_LEFT) . date('dmy') . substr(uniqid(), -4); @endphp
-                    <label>No: {{ $id_transaksi }} </label>
-                    <input type="hidden" name="id_transaksi" id="id_transaksi" value="{{ $id_transaksi }}">
-                </div>
-
-                <div class="form-group">
-                    <label>Nama Sales: {{ Auth::user()->name }}</label>
-                    <input type="hidden" name="nama_sales" id="nama_sales" value="{{ Auth::user()->name }}">
-                </div>
-
-                <div class="form-group">
-                    <label>Nomor Sales: {{ Auth::user()->phone }}</label>
-                    <input type="hidden" name="nomor_telepon" id="nomor_telepon" value="{{ Auth::user()->phone }}">
-                </div>
-
-                {{-- udah dicoba pake component x-form-group tapi tetep tambah error : billy 10/3 --}}
-
-                <div class="form-group">
-                    <label>Nama Pelanggan:</label>
-                    <input type="text" name="nama_pelanggan" placeholder="Masukkan nama pelanggan"
-                        oninput="restrictNameInput(this)" required>
-                    <small id="error-message-name" style="color: red; display: none;">Harap masukkan hanya huruf</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Telepon yg bisa dihubungi:</label>
-                    <input type="number" name="telepon_pelanggan" placeholder="Masukkan telepon pelanggan" maxlength="12"
-                        oninput="validateInjectionNumber(this)" required>
-                    <small id="error-message-injeksi" style="color: red; display: none;">Harap masukkan hanya angka dan
-                        maksimal 12 digit</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Pilih Paket Internet:</label>
-                    <div class="checkbox-group">
-                        @foreach ($produks as $produk)
-                            <div class="checkbox-box">
-                                <input type="radio" id="produk{{ $produk->id }}" name="produk"
-                                    value="{{ $produk->id }}" onchange="filterMerchandises({{ $produk->id }})">
-                                <label for="produk{{ $produk->id }}">
-                                    <span class="checkbox-icon"></span>
-                                    {{ $produk->produk_nama }} <br>
-                                    {{ $produk->produk_detail }} <br>
-                                    Rp {{ number_format($produk->produk_harga_akhir, 0, ',', '.') }}
-                                </label>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-
-                <label>Add on:</label>
-                    <div>
-                        <input type="checkbox" id="addon_perdana" name="addon_perdana" value="1">
-                        <label> Nomor Perdana Baru </label>
-                        <br><br>
-                    </div>
-
-                <div class="form-group">
-                    <label>Nomor Injeksi: (opsional) (bisa diisi sales, ketika cust beli paket doang, nomor dah dapet gratis) (bisa diisi kasir, ketika cust beli dengan Addon nomor perdana baru)</label>
-                    <input type="number" name="nomor_injeksi" placeholder="Masukkan nomor injeksi" maxlength="12"
-                        oninput="validateInjectionNumber(this)">
-                    <small id="error-message-injeksi" style="color: red; display: none;">Harap masukkan hanya angka dan
-                        maksimal 12 digit</small>
-                </div>
-
-                <div class="form-group">
-                     <label for="aktivasi-tanggal">Aktivasi Tanggal:</label>
-                     <input type="date" id="aktivasi-tanggal" name="aktivasi_tanggal" class="form-control" required>
-                 </div>
-
-                <div class="form-group">
-                    <label>Pilih Merchandise:</label>
-                    <div class="checkbox-group" id="merchandise-container">
-                        @foreach ($merchandises as $merchandise)
-                            <div class="checkbox-box" data-produk-ids="{{ json_encode($merchandise->produk_ids) }}">
-                                <input type="radio" id="merch{{ $merchandise->id }}" name="merchandise"
-                                    value="{{ $merchandise->id }}" disabled>
-                                <label for="merch{{ $merchandise->id }}">
-                                    <span class="checkbox-icon"></span>
-                                    {{ $merchandise->merch_nama }}
-                                </label>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Tanggal Transaksi:</label>
-                    <input type="datetime-local" id="tanggal_transaksi" name="tanggal_transaksi" class="form-control"
-                        value="<?php echo date('Y-m-d\TH:i'); ?>" readonly required>
-                </div>
                 
-                <div class="form-group" style="text-align: center; margin-top: 20px;">
-                    <button type="submit" onclick="return OkeForm()">Oke</button>
-                    <button type="button" onclick="cancelForm()">Cancel</button>
+                {{-- Hidden Fields --}}
+                @php $id_transaksi = 'T' . str_pad(Auth::user()->id, 3, '0', STR_PAD_LEFT) . date('dmy') . substr(uniqid(), -4); @endphp
+                <input type="hidden" name="id_transaksi" value="{{ $id_transaksi }}">
+                <input type="hidden" name="nama_sales" value="{{ Auth::user()->name }}">
+                <input type="hidden" name="nomor_telepon" value="{{ Auth::user()->phone }}">
+                <input type="hidden" id="tanggal_transaksi" name="tanggal_transaksi" value="{{ date('Y-m-d\TH:i') }}">
+
+                <!-- Section 1: Informasi Pelanggan -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-user-circle"></i> Informasi Pelanggan
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nama Lengkap Pelanggan</label>
+                            <input type="text" name="nama_pelanggan" class="form-control" placeholder="Contoh: Budi Santoso" oninput="restrictNameInput(this)" required>
+                            <small id="error-message-name" class="text-danger" style="display: none;">Harap masukkan hanya huruf</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nomor WhatsApp Pelanggan</label>
+                            <input type="number" name="telepon_pelanggan" class="form-control" placeholder="0812xxxx" maxlength="13" oninput="validateInjectionNumber(this)" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Pilih Paket & Merchandise -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-box-open"></i> Pilih Paket Internet
+                    </div>
+                    <div class="package-grid mb-4">
+                        @foreach ($produks as $produk)
+                            <label class="package-item">
+                                <input type="radio" name="produk" value="{{ $produk->id }}" onchange="filterMerchandises({{ $produk->id }})" required>
+                                <div class="package-box">
+                                    <span class="package-name">{{ $produk->produk_nama }}</span>
+                                    <small class="text-muted d-block">{{ $produk->produk_detail }}</small>
+                                    <span class="package-price">Rp {{ number_format($produk->produk_harga_akhir, 0, ',', '.') }}</span>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    <div class="section-title mt-4 pt-3">
+                        <i class="fas fa-gift"></i> Pilih Merchandise
+                    </div>
+                    <div class="package-grid" id="merchandise-container">
+                        @foreach ($merchandises as $merchandise)
+                            <label class="package-item radio-item" data-produk-ids="{{ json_encode($merchandise->produk_ids) }}">
+                                <input type="radio" name="merchandise" value="{{ $merchandise->id }}" disabled required>
+                                <div class="package-box d-flex align-items-center justify-content-center text-center p-3">
+                                    <span class="fw-bold small">{{ $merchandise->merch_nama }}</span>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Section 3: Metode Pembayaran -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-credit-card"></i> Metode Pembayaran
+                    </div>
+                    <div class="package-grid">
+                        <label class="package-item">
+                            <input type="radio" name="metode_pembayaran" value="Tunai" required>
+                            <div class="package-box d-flex align-items-center gap-3">
+                                <div class="payment-icon rounded-circle bg-success-subtle text-success">
+                                    <i class="fas fa-money-bill-wave fa-lg"></i>
+                                </div>
+                                <div>
+                                    <span class="package-name mb-0">Tunai</span>
+                                    <small class="text-muted">Bayar dengan uang tunai</small>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="package-item">
+                            <input type="radio" name="metode_pembayaran" value="Nontunai" required>
+                            <div class="package-box d-flex align-items-center gap-3">
+                                <div class="payment-icon rounded-circle bg-primary-subtle text-primary">
+                                    <i class="fas fa-qrcode fa-lg"></i>
+                                </div>
+                                <div>
+                                    <span class="package-name mb-0">Nontunai</span>
+                                    <small class="text-muted">QRIS, Transfer, Bank</small>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Section 4: Detail Tambahan -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-info-circle"></i> Detail Tambahan
+                    </div>
+                    <div class="row g-4 align-items-end">
+                        <div class="col-md-12 mb-2">
+                            <label class="addon-pill">
+                                <input type="checkbox" name="addon_perdana" value="1" class="d-none">
+                                <i class="fas fa-plus-square text-muted"></i>
+                                <span>Tambah Nomor Perdana Baru</span>
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nomor Injeksi (Jika ada)</label>
+                            <input type="number" name="nomor_injeksi" class="form-control" placeholder="0812xxxx" maxlength="13">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tanggal Aktivasi</label>
+                            <input type="date" id="aktivasi-tanggal" name="aktivasi_tanggal" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="button" class="btn btn-light btn-action px-5" onclick="cancelForm()">Batal</button>
+                    <button type="submit" class="btn btn-primary-tsel btn-action px-5" onclick="return OkeForm()">Proses Transaksi</button>
                 </div>
             </form>
-            {{--  --}}
+            </form>
+        </div>
 
-        </div>
-        </div>
+        @if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: "Berhasil!",
+                    text: "{{ session('success') }}",
+                    icon: "success",
+                    confirmButtonColor: '#bc0007'
+                });
+            });
+        </script>
+        @endif
+
+        @if(session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: "Gagal!",
+                    text: "{{ session('error') }}",
+                    icon: "error",
+                    confirmButtonColor: '#bc0007'
+                });
+            });
+        </script>
+        @endif
+
     </body>    
 </x-Sales.SalesLayouts>
 
@@ -320,16 +378,34 @@
     }
 
     function filterMerchandises(selectedProdukId) {
-        const merchandises = document.querySelectorAll('#merchandise-container .checkbox-box');
+        const merchandises = document.querySelectorAll('#merchandise-container .radio-item');
+        const selectedIdStr = String(selectedProdukId);
+
         merchandises.forEach(merchandise => {
-            const produkIds = JSON.parse(merchandise.getAttribute('data-produk-ids'));
-            const checkbox = merchandise.querySelector('input');
-            if (produkIds.includes(selectedProdukId)) {
-                checkbox.disabled = false;
+            const attrValue = merchandise.getAttribute('data-produk-ids');
+            let produkIds = [];
+            try {
+                produkIds = JSON.parse(attrValue) || [];
+            } catch (e) {
+                produkIds = [];
+            }
+
+            const input = merchandise.querySelector('input');
+            
+            // Periksa apakah produk yang dipilih ada dalam daftar produk_ids milik merchandise ini
+            // Jika produk_ids kosong, berarti merchandise ini tersedia untuk SEMUA paket
+            const isAllowed = produkIds.length === 0 || produkIds.map(String).includes(selectedIdStr);
+
+            if (isAllowed) {
+                input.disabled = false;
+                merchandise.classList.remove('disabled');
                 merchandise.classList.add('highlight');
+                // Berikan efek transisi halus
+                merchandise.style.transition = "all 0.3s ease";
             } else {
-                checkbox.disabled = true;
-                checkbox.checked = false;
+                input.disabled = true;
+                input.checked = false;
+                merchandise.classList.add('disabled');
                 merchandise.classList.remove('highlight');
             }
         });
@@ -350,6 +426,7 @@
 
         const selectedProduk = document.querySelector("input[name='produk']:checked");
         const selectedMerchandise = document.querySelector("input[name='merchandise']:checked");
+        const selectedMetode = document.querySelector("input[name='metode_pembayaran']:checked");
         const errorMessage = "Harap lengkapi semua kolom!";
 
         if (!selectedProduk) {
@@ -361,22 +438,22 @@
             Swal.fire({ title: "Peringatan!", text: "Harap pilih merchandise yang tersedia!", icon: "warning" });
             return false;
         }
+
+        if (!selectedMetode) {
+            Swal.fire({ title: "Peringatan!", text: "Harap pilih metode pembayaran!", icon: "warning" });
+            return false;
+        }
         if (isValid) {
-            alert("Transaksi sukses dan telah disimpan");
-
-            // Clear all form inputs
-            const form = document.querySelector("form");
-            form.reset();
-
-            // Clear any custom styling
-            inputs.forEach(input => {
-                input.style.borderColor = "";
+            // Show loading state
+            Swal.fire({
+                title: 'Memproses Transaksi...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
             });
-
-            // Refresh the page after a brief delay
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
             return true;
         } else {
             Swal.fire({

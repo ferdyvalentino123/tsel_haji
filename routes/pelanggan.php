@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Pelanggan\PelangganController;
 
-Route::middleware(['pelanggan'])->group(function () {
+Route::middleware(['pelanggan', 'complete_profile'])->group(function () {
     // Dashboard Pelanggan - Lihat Produk
     Route::get('/programhaji/pelanggan/home', [PelangganController::class, 'index'])
         ->name('pelanggan.home');

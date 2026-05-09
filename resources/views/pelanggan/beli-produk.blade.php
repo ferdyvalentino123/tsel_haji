@@ -1,4 +1,4 @@
-﻿<x-pelanggan.layouts>
+<x-pelanggan.layouts>
     <style>
         :root {
             --tsel-primary: #bc0007;
@@ -450,13 +450,22 @@
                 <input type="email" class="form-control" value="{{ Auth::user()->email }}" readonly>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mb-4">
                 <label for="nomor_telepon" class="form-label">
-                    <i class="fas fa-phone"></i> Nomor Telepon Roaming
+                    <i class="fas fa-phone"></i> Nomor Telepon (Target Injeksi)
                 </label>
                 <input type="tel" name="nomor_telepon" id="nomor_telepon" class="form-control"
-                    placeholder="Contoh: 082123456789" pattern="[0-9]{10,13}" required>
-                <small class="text-muted">Masukkan nomor yang akan di-isi roaming (10-13 digit)</small>
+                    value="{{ Auth::user()->phone }}" readonly required>
+                <small class="text-muted">Paket data akan langsung dikirim ke nomor profil Anda.</small>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="aktivasi_tanggal" class="form-label">
+                    <i class="fas fa-calendar-alt"></i> Tanggal Aktivasi Paket
+                </label>
+                <input type="date" name="aktivasi_tanggal" id="aktivasi_tanggal" class="form-control"
+                    min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}" required>
+                <small class="text-muted">Pilih tanggal kapan paket RoaMAX Anda ingin mulai diaktifkan.</small>
             </div>
             {{-- <div class="mb-4">
                 <label class="form-label">
@@ -529,12 +538,16 @@
         document.getElementById('purchaseForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            const activationDate = document.getElementById('aktivasi_tanggal').value;
+            const formattedDate = new Date(activationDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
             Swal.fire({
                 title: 'Konfirmasi Pembelian',
                 html: `
                     <p>Anda akan membeli:</p>
-                    <strong>${currentQuantity} paket {{ $produk->produk_nama }}</strong><br>
-                    <strong>Total: Rp ${(basePrice * currentQuantity).toLocaleString('id-ID')}</strong>
+                    <strong>{{ $produk->produk_nama }}</strong><br>
+                    <strong>Tanggal Aktivasi: ${formattedDate}</strong><br>
+                    <strong>Total Bayar: Rp ${basePrice.toLocaleString('id-ID')}</strong>
                 `,
                 icon: 'question',
                 showCancelButton: true,

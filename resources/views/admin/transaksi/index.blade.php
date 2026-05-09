@@ -14,8 +14,8 @@
       <div class="stat-icon stat-icon-2">
         <i class="fas fa-receipt"></i>
       </div>
-      <div class="stat-label">Total Transaksi</div>
-      <div class="stat-value">{{ \App\Models\Transaksi::count() }}</div>
+      <div class="stat-label">Total Transaksi {{ request('date') ? '(Filtered)' : '' }}</div>
+      <div class="stat-value">{{ $totalTransaksi }}</div>
     </div>
   </div>
   <div class="col-lg-4 col-md-6">
@@ -23,8 +23,8 @@
       <div class="stat-icon stat-icon-3">
         <i class="fas fa-dollar-sign"></i>
       </div>
-      <div class="stat-label">Total Pendapatan</div>
-      <div class="stat-value">Rp {{ number_format(\App\Models\Transaksi::where('is_paid', 1)->orWhereIn('status', ['lunas', 'success'])->sum("total_harga"), 0, ",", ".") }}</div>
+      <div class="stat-label">Total Pendapatan {{ request('date') ? '(Filtered)' : '' }}</div>
+      <div class="stat-value">Rp {{ number_format($totalPendapatan, 0, ",", ".") }}</div>
     </div>
   </div>
   <div class="col-lg-4 col-md-6">
@@ -32,8 +32,8 @@
       <div class="stat-icon stat-icon-1">
         <i class="fas fa-check-circle"></i>
       </div>
-      <div class="stat-label">Sudah Dibayar</div>
-      <div class="stat-value">{{ \App\Models\Transaksi::where("is_paid", 1)->count() }}</div>
+      <div class="stat-label">Sudah Dibayar {{ request('date') ? '(Filtered)' : '' }}</div>
+      <div class="stat-value">{{ $totalDibayar }}</div>
     </div>
   </div>
 </div>
@@ -46,30 +46,43 @@
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 w-100">
           <h5 class="mb-0"><i class="fas fa-list me-2" style="color: #bc0007;"></i>Daftar Semua Transaksi</h5>
           <div class="d-flex gap-2 flex-wrap align-items-center">
-            {{-- Filter tanggal --}}
-            <form method="GET" class="d-flex gap-2" id="filterForm">
-              <input type="date" name="date" class="form-control form-control-sm" value="{{ request('date') }}">
-              <button type="submit" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-filter me-1"></i>Filter
-              </button>
-              @if(request('date'))
-                <a href="{{ route('admin.transaksi.index') }}" class="btn btn-sm btn-outline-secondary" title="Reset filter">
-                  <i class="fas fa-times"></i>
-                </a>
-              @endif
-            </form>
-            {{-- Tombol Export Excel — meneruskan filter tanggal yang sedang aktif --}}
-            <a href="{{ route('admin.transaksi.export', request()->only('date')) }}"
-               class="btn btn-sm btn-success d-flex align-items-center gap-1"
-               title="{{ request('date') ? 'Export data ' . request('date') : 'Export semua transaksi' }}">
-              <i class="fas fa-file-excel"></i>
-              <span>Export Excel</span>
-              @if(request('date'))
-                <span class="badge bg-white text-success ms-1" style="font-size:0.65rem;">
-                  {{ \Carbon\Carbon::parse(request('date'))->translatedFormat('d M Y') }}
-                </span>
-              @endif
-            </a>
+            {{-- Filter & Export Group --}}
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+              <form method="GET" class="d-flex gap-2 align-items-center flex-wrap" id="filterForm">
+                <div class="input-group input-group-sm" style="width: 250px;">
+                  <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                  <input type="text" name="search" class="form-control border-start-0" placeholder="Cari Pelanggan / Sales..." value="{{ request('search') }}">
+                </div>
+
+                <input type="date" name="date" class="form-control form-control-sm" value="{{ request('date') }}" style="width: 150px;">
+                
+                <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-1">
+                  <i class="fas fa-filter" style="font-size: 0.75rem;"></i>
+                  <span>Filter</span>
+                </button>
+                
+                @if(request('date') || request('search'))
+                  <a href="{{ route('admin.transaksi.index') }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center" title="Reset filter" style="width: 31px; height: 31px;">
+                    <i class="fas fa-times"></i>
+                  </a>
+                @endif
+              </form>
+              
+              <div class="vr mx-1 d-none d-md-block" style="height: 20px; opacity: 0.2;"></div>
+
+              {{-- Tombol Export Excel — meneruskan filter tanggal yang sedang aktif --}}
+              <a href="{{ route('admin.transaksi.export', request()->only('date')) }}"
+                 class="btn btn-sm btn-success d-flex align-items-center gap-2 px-3"
+                 title="{{ request('date') ? 'Export data ' . request('date') : 'Export semua transaksi' }}">
+                <i class="fas fa-file-excel"></i>
+                <span class="fw-bold">Export Excel</span>
+                @if(request('date'))
+                  <span class="badge bg-white text-success ms-1" style="font-size:0.65rem; padding: 2px 6px;">
+                    {{ \Carbon\Carbon::parse(request('date'))->translatedFormat('d M Y') }}
+                  </span>
+                @endif
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -80,7 +93,8 @@
               <th>No</th>
               <th>ID Transaksi</th>
               <th>Pelanggan</th>
-              <th>No. Roaming</th>
+              <th>Nomor Telepon</th>
+              <th>Sales</th>
               <th>Jumlah</th>
               <th>Tanggal</th>
               <th>Status Bayar</th>
@@ -88,29 +102,16 @@
             </tr>
           </thead>
           <tbody>
-            @forelse($transaksi ?? \App\Models\Transaksi::latest()->paginate(20) as $t)
+            @forelse($transaksi ?? \App\Models\Transaksi::latest()->get() as $t)
               <tr>
                 <td><strong>{{ $loop->iteration }}</strong></td>
                 <td>#{{ $t->id_transaksi }}</td>
                 <td>{{ $t->nama_pelanggan }}</td>
-                {{-- Kolom No. Roaming: ditampilkan badge jika kosong, tombol edit selalu ada --}}
                 <td>
-                  <div class="d-flex align-items-center gap-2">
-                    <span id="roaming-display-{{ $t->id }}"
-                          class="roaming-value {{ $t->nomor_roaming ? 'text-dark fw-semibold' : 'text-muted fst-italic' }}">
-                      {{ $t->nomor_roaming ?: '-' }}
-                    </span>
-                    @if(!$t->nomor_roaming)
-                      <span class="badge bg-secondary" style="font-size:0.65rem;">Belum diisi</span>
-                    @endif
-                    <button type="button"
-                            class="btn btn-link btn-sm p-0 ms-1 text-primary"
-                            title="Edit No. Roaming"
-                            onclick="openRoamingModal({{ $t->id }}, '{{ addslashes($t->nomor_roaming ?? '') }}', '{{ $t->id_transaksi }}')"
-                            style="line-height:1;">
-                      <i class="fas fa-pencil-alt" style="font-size:0.75rem;"></i>
-                    </button>
-                  </div>
+                  <span class="fw-semibold text-dark">{{ $t->telepon_pelanggan ?: ($t->pelanggan->phone ?? '-') }}</span>
+                </td>
+                <td>
+                  <span>{{ $t->nama_sales ?: '-' }}</span>
                 </td>
                 <td>
                   <span class="badge bg-success">Rp {{ number_format($t->total_harga, 0, ",", ".") }}</span>
@@ -127,9 +128,21 @@
                 </td>
                 <td>
                   <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" onclick="viewTransaksiDetail('{{ $t->id_transaksi ?? $t->id }}', '{{ addslashes($t->nama_pelanggan ?? '') }}', 'Rp {{ number_format($t->total_harga, 0, ',', '.') }}', '{{ $t->tanggal_transaksi ? \Carbon\Carbon::parse($t->tanggal_transaksi)->format('d M Y H:i') : '' }}', '{{ ($t->is_paid || in_array($t->status, ['lunas', 'success'])) ? 'Dibayar' : 'Pending' }}', '{{ addslashes($t->nomor_roaming ?? '') }}')" class="btn btn-outline-info" title="Detail">
+                    <button type="button" onclick="viewTransaksiDetail('{{ $t->id_transaksi ?? $t->id }}', '{{ addslashes($t->nama_pelanggan ?? '') }}', 'Rp {{ number_format($t->total_harga, 0, ',', '.') }}', '{{ $t->tanggal_transaksi ? \Carbon\Carbon::parse($t->tanggal_transaksi)->format('d M Y H:i') : '' }}', '{{ ($t->is_paid || in_array($t->status, ['lunas', 'success'])) ? 'Dibayar' : 'Pending' }}', '{{ $t->telepon_pelanggan ?: ($t->pelanggan->phone ?? '-') }}', '{{ $t->nama_sales }}', '{{ addslashes($t->produk ? $t->produk->produk_nama : ($t->jenis_paket ?: '-')) }}', '{{ $t->nomor_injeksi ?: '-' }}')" class="btn btn-outline-info" title="Detail">
                       <i class="fas fa-eye"></i>
                     </button>
+                    
+                    @if(($t->status == 'lunas' || $t->status == 'success' || $t->is_paid))
+                      @if(!$t->is_activated)
+                        <button type="button" onclick="prosesAktivasi('{{ route('admin.transaksi.aktivasi', $t->id) }}', '{{ $t->nama_pelanggan }}', '{{ $t->nomor_injeksi ?: $t->telepon_pelanggan }}')" class="btn btn-warning" title="Aktivasi Paket">
+                          <i class="fas fa-bolt"></i> Aktivasi
+                        </button>
+                      @else
+                        <button type="button" class="btn btn-success disabled" title="Sudah Aktif">
+                          <i class="fas fa-check-double"></i> Aktif
+                        </button>
+                      @endif
+                    @endif
                   </div>
                 </td>
               </tr>
@@ -148,15 +161,11 @@
 </div>
 
 <script>
-function viewTransaksiDetail(id, nama, total, tgl, status, roaming) {
+function viewTransaksiDetail(id, nama, total, tgl, status, roaming, sales, produk, injeksi) {
     let badge = status === 'Dibayar' 
         ? '<span class="badge bg-success px-3 py-2"><i class="fas fa-check-circle"></i> Lunas</span>' 
         : '<span class="badge bg-warning text-dark px-3 py-2"><i class="fas fa-clock"></i> Pending</span>';
 
-    let roamingDisplay = roaming
-        ? `<strong class="text-dark">${roaming}</strong>`
-        : `<span class="text-muted fst-italic">Belum diisi</span>`;
-        
     Swal.fire({
         title: 'Pesanan #' + id,
         html: `
@@ -165,11 +174,17 @@ function viewTransaksiDetail(id, nama, total, tgl, status, roaming) {
                     ${badge}
                     <span class="text-muted fw-bold"><i class="far fa-calendar-alt"></i> ${tgl}</span>
                 </div>
-                <div class="bg-light p-3 rounded-4 border">
+                <div class="bg-light p-3 rounded-4 border mb-3">
+                    <div class="text-muted mb-1 small">Paket yang dibeli:</div>
+                    <div class="fw-bold text-dark fs-6"><i class="fas fa-box-open text-danger me-2"></i> ${produk}</div>
+                </div>
+                <div class="bg-white p-3 rounded-4 border">
                     <table class="table table-borderless table-sm mb-0">
                         <tr><td width="40%" class="text-muted">Pelanggan</td><td><strong class="text-dark">${nama || '-'}</strong></td></tr>
+                        <tr><td class="text-muted">Nomor Telepon</td><td><strong class="text-dark">${roaming}</strong></td></tr>
+                        <tr><td class="text-muted">Sales</td><td><span>${sales || '-'}</span></td></tr>
                         <tr><td class="text-muted">Total Bayar</td><td><strong class="text-danger fs-5">${total}</strong></td></tr>
-                        <tr><td class="text-muted">No. Roaming</td><td>${roamingDisplay}</td></tr>
+                        <tr><td class="text-muted">Nomor Injeksi</td><td><strong style="color: #00bc67ff; font-size: 1.1rem;">${injeksi}</strong></td></tr>
                     </table>
                 </div>
             </div>
@@ -182,152 +197,72 @@ function viewTransaksiDetail(id, nama, total, tgl, status, roaming) {
         }
     });
 }
-</script>
 
-{{-- ═══════════════════════════════════════════════════════════
-     Modal Edit No. Roaming
-     Diisi manual oleh tim internal — data API Telkomsel belum tersedia
-     ═══════════════════════════════════════════════════════════ --}}
-<div class="modal fade" id="roamingModal" tabindex="-1" aria-labelledby="roamingModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-      <div class="modal-header border-0" style="background: linear-gradient(135deg,#bc0007,#e2241d); color:#fff;">
-        <h5 class="modal-title fw-bold" id="roamingModalLabel">
-          <i class="fas fa-sim-card me-2"></i>Edit No. Roaming
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-      </div>
-      <div class="modal-body px-4 py-4">
-        <div class="alert alert-light border d-flex align-items-start gap-2 py-2 px-3 mb-3" style="font-size:0.82rem;">
-          <i class="fas fa-info-circle text-primary mt-1 flex-shrink-0"></i>
-          <span>Nomor roaming diisi secara <strong>manual oleh tim internal</strong>. Kosongkan untuk menghapus nomor roaming yang sudah tersimpan.</span>
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold text-muted small text-uppercase" for="roamingIdTransaksiDisplay">
-            <i class="fas fa-receipt me-1"></i>ID Transaksi
-          </label>
-          <input type="text" id="roamingIdTransaksiDisplay" class="form-control bg-light" readonly>
-        </div>
-        <div class="mb-1">
-          <label class="form-label fw-semibold text-muted small text-uppercase" for="roamingNomor">
-            <i class="fas fa-sim-card me-1"></i>Nomor Roaming
-          </label>
-          <input type="text" id="roamingNomor" class="form-control"
-                 placeholder="Contoh: +628123456789"
-                 maxlength="20"
-                 autocomplete="off">
-          <div id="roamingError" class="invalid-feedback"></div>
-        </div>
-        <p class="text-muted mb-0" style="font-size:0.72rem; margin-top:4px;">
-          Maksimal 20 karakter. Hanya angka, +, -, atau spasi.
-        </p>
-      </div>
-      <div class="modal-footer border-0 px-4 pb-4 gap-2">
-        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
-          <i class="fas fa-times me-1"></i>Batal
-        </button>
-        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold" id="roamingSaveBtn"
-                onclick="saveRoaming()">
-          <i class="fas fa-save me-1"></i>Simpan
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-// ID primary key transaksi yang sedang diedit
-let _roamingTargetId = null;
-
-/**
- * Buka modal edit No. Roaming.
- * @param {number} transaksiId  - primary key (id) baris transaksi
- * @param {string} currentValue - nilai nomor_roaming saat ini (bisa '')
- * @param {string} idTransaksi  - id_transaksi (untuk ditampilkan ke user)
- */
-function openRoamingModal(transaksiId, currentValue, idTransaksi) {
-    _roamingTargetId = transaksiId;
-    document.getElementById('roamingIdTransaksiDisplay').value = '#' + idTransaksi;
-    document.getElementById('roamingNomor').value = currentValue || '';
-    // Reset state error
-    const nomInput = document.getElementById('roamingNomor');
-    nomInput.classList.remove('is-invalid');
-    document.getElementById('roamingError').textContent = '';
-    new bootstrap.Modal(document.getElementById('roamingModal')).show();
-}
-
-/**
- * Kirim PATCH request untuk menyimpan / menghapus nomor roaming.
- * Update tampilan tabel secara inline tanpa reload halaman.
- */
-function saveRoaming() {
-    if (!_roamingTargetId) return;
-
-    const nomor   = document.getElementById('roamingNomor').value.trim();
-    const saveBtn = document.getElementById('roamingSaveBtn');
-    const nomInput = document.getElementById('roamingNomor');
-
-    // Reset error
-    nomInput.classList.remove('is-invalid');
-    document.getElementById('roamingError').textContent = '';
-
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Menyimpan...';
-
-    fetch(`{{ url('/programhaji/admin/transaksi') }}/${_roamingTargetId}/roaming`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Accept': 'application/json',
+function prosesAktivasi(url, nama, nomor) {
+    Swal.fire({
+        title: 'Aktivasi Paket',
+        html: `
+            <div class="text-start mb-3">
+                <p class="mb-1 text-muted">Pelanggan: <strong>${nama}</strong></p>
+                <p class="mb-0 text-muted">No. Injeksi: <strong>${nomor}</strong></p>
+            </div>
+            <div class="alert alert-info py-2 small">
+                <i class="fas fa-info-circle"></i> Silakan upload screenshot bukti injeksi dari sistem Telkomsel untuk menyelesaikan transaksi.
+            </div>
+        `,
+        input: 'file',
+        inputAttributes: {
+            'accept': 'image/*,application/pdf',
+            'aria-label': 'Upload bukti injeksi'
         },
-        body: JSON.stringify({ nomor_roaming: nomor || null })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            // ── Update tampilan kolom inline ──────────────────────────
-            const display = document.getElementById('roaming-display-' + _roamingTargetId);
-            if (display) {
-                if (data.nomor_roaming) {
-                    display.textContent = data.nomor_roaming;
-                    display.className = 'roaming-value text-dark fw-semibold';
-                    // Hapus badge "Belum diisi" jika ada
-                    const nextEl = display.nextElementSibling;
-                    if (nextEl && nextEl.classList.contains('badge')) nextEl.remove();
-                } else {
-                    display.textContent = '-';
-                    display.className = 'roaming-value text-muted fst-italic';
-                }
+        showCancelButton: true,
+        confirmButtonText: 'Upload & Aktifkan',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#bc0007',
+        showLoaderOnConfirm: true,
+        preConfirm: (file) => {
+            if (!file) {
+                Swal.showValidationMessage('Anda harus memilih file bukti injeksi!');
+                return false;
             }
-            // ── Tutup modal & tampilkan notifikasi sukses ─────────────
-            bootstrap.Modal.getInstance(document.getElementById('roamingModal')).hide();
+            
+            let formData = new FormData();
+            formData.append('bukti_injeksi', file);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            return fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                Swal.showValidationMessage(`Request failed: ${error}`);
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed) {
             Swal.fire({
                 icon: 'success',
-                title: 'Tersimpan!',
-                text: 'Nomor roaming berhasil diperbarui.',
-                timer: 2000,
-                showConfirmButton: false,
+                title: 'Berhasil!',
+                text: 'Paket telah diaktifkan dan bukti telah diunggah.',
+                confirmButtonColor: '#bc0007'
+            }).then(() => {
+                location.reload();
             });
-        } else {
-            // Tampilkan error validasi dari server
-            nomInput.classList.add('is-invalid');
-            document.getElementById('roamingError').textContent =
-                data.message || 'Terjadi kesalahan. Periksa kembali input Anda.';
         }
-    })
-    .catch(() => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal Terhubung',
-            text: 'Tidak dapat terhubung ke server. Periksa koneksi Anda dan coba lagi.',
-        });
-    })
-    .finally(() => {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save me-1"></i>Simpan';
     });
 }
 </script>
+
+
 
 @endsection

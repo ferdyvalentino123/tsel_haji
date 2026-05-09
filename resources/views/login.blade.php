@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Masuk - The Sacred Journey</title>
+    <title>SISTER - Login Page</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -107,7 +107,7 @@
             <div class="md:w-5/12 bg-primary relative overflow-hidden flex flex-col justify-between p-6 md:p-8 text-on-primary">
                 <!-- Branding Overlap -->
                 <div class="z-10">
-                    <h1 class="font-headline text-2xl font-extrabold tracking-tight">The Sacred Journey</h1>
+                    <h1 class="font-headline text-2xl font-extrabold tracking-tight">S I S T E R</h1>
                     <p class="mt-2 text-on-primary/80 font-medium text-xs md:text-sm max-w-xs">Menghubungkan perjalanan spiritual Anda dengan kemudahan layanan digital yang terpercaya.</p>
                 </div>
                 <!-- Decorative Islamic Elements -->

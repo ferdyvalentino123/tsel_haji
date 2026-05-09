@@ -68,8 +68,13 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role === 'sales' && !$user->is_setoran) {
-            session()->flash('alert', 'Silahkan setoran dahulu ke supervisor.');
+        $hasUnsetorPastDays = Transaksi::where('nama_sales', $user->name)
+            ->where('is_setor', false)
+            ->whereDate('tanggal_transaksi', '<', now()->format('Y-m-d'))
+            ->exists();
+
+        if ($user->role === 'sales' && $hasUnsetorPastDays && !$user->is_setoran) {
+            session()->flash('alert', 'Silahkan setoran dahulu ke supervisor untuk transaksi hari sebelumnya.');
             return redirect()->route('sales.home');
         }
         $produks = Produk::all();
@@ -82,13 +87,16 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
+        $user = auth()->user();
+        
         $transaksi = Transaksi::withTrashed()
             ->with('produk')
+            ->where('nama_sales', $user->name)
             ->orderBy('tanggal_transaksi', 'desc')
             ->get();
 
         $groupedTransaksi = $transaksi->groupBy(function ($item) {
-            return Carbon::today()->format('Y-m-d');
+            return Carbon::parse($item->tanggal_transaksi)->format('Y-m-d');
         });
 
         $totalsPerDate = $groupedTransaksi->map(function ($items) {
@@ -108,7 +116,7 @@ class DashboardController extends Controller
         $totalPenjualan = $totalsPerDate->sum('totalPenjualan');
         $totalInsentif = $totalsPerDate->sum('totalInsentif');
 
-        return view('sales/home', compact('groupedTransaksi', 'totalsPerDate', 'totalPenjualan', 'totalInsentif'));
+        return view('sales/home', compact('transaksi', 'groupedTransaksi', 'totalsPerDate', 'totalPenjualan', 'totalInsentif'));
     }
     public function tampilsales()
     {

@@ -21,6 +21,6 @@ class salesleftDrawer extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.sales.left-drawer');
+        return view('components.Sales.SalesLeftDrawer');
     }
 }

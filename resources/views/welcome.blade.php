@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Selamat Datang di Program Haji Telkomsel</title>
+    <title>Sistem Telkomsel RoaMAX Haji</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -21,9 +21,14 @@
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(to bottom right, #f1f5f9, #c3dafe);
+            background: linear-gradient(135deg, #f9f9f9 0%, #f1f5f9 100%);
             height: 100vh;
             overflow-x: hidden;
+        }
+
+        .islamic-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l2.5 12.5L45 15l-12.5 2.5L30 30l-2.5-12.5L15 15l12.5-2.5L30 0zm0 30l2.5 12.5L45 45l-12.5 2.5L30 60l-2.5-12.5L15 45l12.5-2.5L30 30z' fill='%23bc0007' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-attachment: fixed;
         }
 
         .card {
@@ -280,11 +285,11 @@
         <div class="image-header">
             <img src="{{ asset('admin_asset/img/photos/layer 1.png') }}" alt="Layer 1">
         </div>
-        <h1>PONDOK HAJI Telkomsel</h1>
-        <p>Selamat datang di sistem layanan pelanggan dan transaksi <strong style="color: #ec1c24;">Program Haji
-                Telkomsel</strong><br>
-            Untuk <strong>Sales & Kasir</strong> - Semangat Melayani Jamaah Menuju Tanah Suci<br>
-            <br> Silakan masuk untuk melanjutkan aktivitas Anda.
+        <h1>Sistem Telkomsel RoaMAX Haji</h1>
+        <p>Selamat datang di pusat layanan terpadu <br> <strong style="color: #ec1c24;">Program Haji
+                Telkomsel</strong> <br>
+            Solusi komunikasi terbaik untuk mendukung kelancaran ibadah jamaah
+         <br> di Tanah Suci.
         </p>
         <a href="{{ url('/programhaji/login') }}" class="btn-cta">
             <i class="fas fa-sign-in-alt me-2"></i> Masuk ke Aplikasi
@@ -299,7 +304,7 @@
             <i class="fas fa-hands-helping icon-decor"></i>
         </div>
 
-        <!-- Galeri Karyawan -->
+        {{-- <!-- Galeri Karyawan -->
         <div class="staff-carousel-wrapper">
             <div class="staff-carousel" id="staffCarousel">
                 <div class="staff-card">
@@ -316,7 +321,7 @@
                     <img src="{{ asset('admin_asset/img/photos/firoh12.jpg') }}" alt="Billy">
                     <h6>Dhofiroh Azzah</h6>
                     <p style="font-size: small; font-weight: 200;">Valinfi Team</p>
-                </div>
+                </div> --}}
                 {{-- <div class="staff-card">
                     <img src="{{ asset('admin_asset/img/photos/VALEN00013.JPG') }}" alt="Firoh">
                     <h6>Ferdy Valentino</h6>

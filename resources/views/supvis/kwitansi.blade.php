@@ -129,14 +129,18 @@
         }
 
         .status-lunas {
-            background-color: #10b981;
-            color: #ffffff;
+            background-color: #10b981 !important;
+            color: #ffffff !important;
             font-weight: bold;
             font-size: 14px;
             padding: 6px 16px;
             border-radius: 15px;
+            border: 2px solid #10b981 !important;
             letter-spacing: 1px;
             display: inline-block;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         /* Footer */
@@ -214,11 +218,20 @@
                 <td class="colon">:</td>
                 <td class="value">{{ $formData['telepon_pelanggan'] }}</td>
             </tr>
+            @if(isset($formData['nomor_injeksi']) && $formData['nomor_injeksi'])
             <tr>
                 <td class="label">Nomor Injeksi</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $formData['nomor_injeksi'] ?? '-' }}</td>
+                <td class="value">{{ $formData['nomor_injeksi'] }}</td>
             </tr>
+            @endif
+            @if(isset($formData['addon_perdana']) && $formData['addon_perdana'])
+            <tr>
+                <td class="label">Add-On</td>
+                <td class="colon">:</td>
+                <td class="value" style="color: #10b981;">Nomor Perdana Baru</td>
+            </tr>
+            @endif
         </table>
 
         <!-- Product Highlight Box -->
@@ -244,9 +257,9 @@
                 <td class="value">{{ $formData['merch_nama'] ?? '-' }}</td>
             </tr>
             <tr>
-                <td class="label">Masa Aktif</td>
+                <td class="label">Tanggal Aktivasi</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $formData['aktivasi_tanggal'] ?? '-' }}</td>
+                <td class="value">{{ \Carbon\Carbon::parse($formData['aktivasi_tanggal'])->format('d M Y') }}</td>
             </tr>
         </table>
 
@@ -254,7 +267,7 @@
         <div class="footer">
             <div class="thanks">Terima Kasih!</div>
             <p>Layanan Pelanggan Telkomsel</p>
-            <p>Admin: {{ $formData['nama_sales'] }}</p>
+            <p>Petugas: {{ $formData['nama_sales'] }}</p>
             @if(isset($formData['nomor_telepon']) && $formData['nomor_telepon'])
                 <p>CS: {{ $formData['nomor_telepon'] }}</p>
             @endif
