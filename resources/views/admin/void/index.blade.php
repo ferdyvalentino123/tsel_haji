@@ -54,11 +54,11 @@
                         <thead class="bg-light">
                             <tr>
                                 <th class="ps-4">ID Transaksi</th>
-                                <th>Tanggal</th>
-                                <th>Sales Person</th>
+                                <th>Waktu</th>
+                                <th>Sales</th>
                                 <th>Pelanggan</th>
                                 <th>Paket RoaMAX</th>
-                                <th>Nilai</th>
+                                <th>Harga</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -72,7 +72,7 @@
                                 @foreach ($items as $item)
                                     <tr class="void-row">
                                         <td class="ps-4 fw-bold id-transaksi text-muted">{{ $item->id_transaksi }}</td>
-                                        <td class="tanggal small text-muted">{{ \Carbon\Carbon::parse($item->tanggal_transaksi)->format('H:i') }}</td>
+                                        <td class="tanggal small text-muted">{{ \Carbon\Carbon::parse($item->tanggal_transaksi)->format('H:i') }} WIB</td>
                                         <td class="nama-sales">
                                             <div class="d-flex align-items-center">
                                                 <div class="bg-secondary bg-opacity-10 rounded-circle p-2 me-2">

@@ -37,6 +37,10 @@ Route::middleware(['auth', 'admin'])->prefix('programhaji/admin')->group(functio
     // Backup route name if needed
     Route::resource('role-users', RoleUsersController::class, ['as' => 'admin']);
 
+    // Rekapan Insentif Sales
+    Route::get('/insentif-summary', [HomeController::class, 'incentiveSummary'])->name('admin.insentif.summary');
+
+
     // Monitoring & Financial Audit
     Route::prefix('monitor')->name('admin.monitor.')->group(function () {
         Route::get('/setoran', [\App\Http\Controllers\Kasir\TransaksiController::class, 'monitorSetoran'])->name('setoran');
@@ -45,3 +49,4 @@ Route::middleware(['auth', 'admin'])->prefix('programhaji/admin')->group(functio
     });
 
 });
+

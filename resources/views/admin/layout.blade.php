@@ -411,11 +411,11 @@
                             <i class="fas fa-trash-alt"></i> Monitor Void
                         </a>
                     </li>
-                    {{-- <li class="sidebar-item {{ request()->routeIs('admin.insentif.summary') ? 'active' : '' }}">
+                    <li class="sidebar-item {{ request()->routeIs('admin.insentif.summary') ? 'active' : '' }}">
                         <a class="sidebar-link" href="{{ route('admin.insentif.summary') }}">
                             <i class="fas fa-money-bill-trend-up"></i> Rekapan Insentif
                         </a>
-                    </li> --}}
+                    </li>
 
                     <li class="sidebar-nav-header">Manajemen</li>
                     <li class="sidebar-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
@@ -504,3 +504,6 @@
 </body>
 
 </html>
+
+
+

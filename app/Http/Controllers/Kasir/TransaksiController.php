@@ -837,6 +837,9 @@ class TransaksiController extends Controller
     public function monitorSetoran(Request $request)
     {
         $transaksi = Transaksi::with(['produk', 'sales'])
+            ->whereHas('sales', function($query) {
+                $query->where('role', 'sales');
+            })
             ->orderBy('tanggal_transaksi', 'desc')
             ->get();
 
