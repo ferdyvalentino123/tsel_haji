@@ -35,9 +35,7 @@ RUN docker-php-ext-install \
     zip \
     intl \
     gd \
-    tokenizer \
-    ctype \
-    fileinfo \
+    xml \
     pcntl
 
 # Install opcache separately (Zend extension)
